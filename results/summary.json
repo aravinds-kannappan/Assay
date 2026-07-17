@@ -1,0 +1,25 @@
+{
+  "note": "Illustrative fixtures. Numbers demonstrate the method, not a finding.",
+  "reconcile": {
+    "n": 24,
+    "strict_acc": 0.5416666666666666,
+    "flexible_acc": 0.875,
+    "delta": 0.33333333333333337,
+    "recovered": 10,
+    "fooled": 2,
+    "paired_p_value": 0.03857421875
+  },
+  "clustering": {
+    "accuracy": 0.5625,
+    "naive_se": 0.07236046734262122,
+    "cr2_se": 0.1789727632909544,
+    "bootstrap_se": 0.16513959475687578,
+    "inflation": 2.4733500191967,
+    "n_clusters": 6
+  },
+  "mde_n200_p0.7_pts": 9.078173671541288,
+  "required_n_2pt": {
+    "unpaired": 4906,
+    "paired_10pct_disagreement": 1963
+  }
+}

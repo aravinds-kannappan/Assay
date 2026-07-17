@@ -26,6 +26,7 @@ dependencies = [
 [project.optional-dependencies]
 parquet = ["pyarrow>=14"]
 dev = ["pytest>=7", "pyarrow>=14"]
+notebook = ["matplotlib>=3.7", "jupyter>=1.0", "nbconvert>=7", "nbformat>=5"]
 
 [project.urls]
 Homepage = "https://github.com/aravinds-kannappan/NoiseFloor"
@@ -34,8 +35,10 @@ Repository = "https://github.com/aravinds-kannappan/NoiseFloor"
 [project.scripts]
 assay = "assay.cli:main"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+# The package imports as `assay` but lives directly in ./src (no nested folder).
+[tool.setuptools]
+package-dir = { assay = "src" }
+packages = ["assay", "assay.ingest", "assay.reconcile"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

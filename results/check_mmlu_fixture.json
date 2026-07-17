@@ -1,0 +1,50 @@
+{
+  "n": 48,
+  "alpha": 0.05,
+  "power": 0.8,
+  "accuracy": {
+    "value": 0.5625,
+    "provenance": "deterministic",
+    "unit": "accuracy"
+  },
+  "naive_se": {
+    "value": 0.07236,
+    "provenance": "statistically estimated",
+    "kind": "clt-se"
+  },
+  "clustered": {
+    "n_clusters": 6,
+    "method": {
+      "value": "CR2",
+      "provenance": "deterministic"
+    },
+    "cluster_se": {
+      "value": 0.178973,
+      "provenance": "statistically estimated",
+      "kind": "cluster-robust-se"
+    },
+    "se_inflation": {
+      "value": 2.4734,
+      "provenance": "statistically estimated",
+      "note": "cluster_se / naive_se"
+    },
+    "ci95": {
+      "value": [
+        0.21172,
+        0.91328
+      ],
+      "provenance": "statistically estimated"
+    },
+    "small_cluster_warning": true,
+    "bootstrap_se": {
+      "value": 0.164114,
+      "provenance": "statistically estimated",
+      "note": "pairs-cluster bootstrap cross-check (6 clusters < 30)"
+    }
+  },
+  "mde_absolute": {
+    "value": 0.200601,
+    "provenance": "statistically estimated",
+    "note": "smallest absolute accuracy gap an unpaired eval of this size can resolve"
+  }
+}

@@ -17,6 +17,10 @@ the exact rule that caused it.
 Every number Assay reports carries one of four provenance tags, enforced by a test:
 `deterministic` · `statistically estimated` · `trained-model` · `LLM-judged`.
 
+**[Live site (interactive)](https://aravinds-kannappan.github.io/NoiseFloor/)** ·
+**[Walkthrough notebook](notebooks/assay_walkthrough.ipynb)** ·
+**[Reproduced figures & outputs](results/)**
+
 ---
 
 ## Why
@@ -52,10 +56,10 @@ This is an early, honest cut. What runs today, exercised by the test suite and o
 | `assay.provenance` | four-tag system + `assert_all_tagged` (CI-enforced) | working |
 | Inspect AI / HELM adapters | same schema, other harnesses | roadmap |
 | `assay gate` (GitHub Action) | annotate PRs with a significance verdict | roadmap |
-| IRT fast subsets, benchmark linter, judge validation | see [docs/plan.html](docs/plan.html) | roadmap |
+| IRT fast subsets, benchmark linter, judge validation | see the [roadmap](https://aravinds-kannappan.github.io/NoiseFloor/#roadmap) | roadmap |
 
 The full design (13 modules, real datasets, two trained models with pre-registered kill
-criteria, a 10-week roadmap) is in **[docs/plan.html](docs/plan.html)**.
+criteria, a 10-week roadmap) is on the **[project site](https://aravinds-kannappan.github.io/NoiseFloor/)**.
 
 ---
 
@@ -131,8 +135,8 @@ Add `--json` to any command for the tagged, machine-readable report.
 
 ## Real data (roadmap audits)
 
-Assay's audits use real, public data only. Exact paths are pinned in
-[docs/plan.html](docs/plan.html); highlights:
+Assay's audits use real, public data only. Exact paths are pinned on the
+[project site](https://aravinds-kannappan.github.io/NoiseFloor/#methods); highlights:
 
 - `open-llm-leaderboard-old/details_*` and `open-llm-leaderboard/*-details`: per-sample
   outcomes for IRT (~34M real binary outcomes, split by base-model family).
@@ -153,19 +157,22 @@ real model outputs and are never reported as findings. See
 ## Development
 
 ```bash
-python -m pytest -q      # 34 tests: stats correctness, reconciler golden values, ingest, provenance
+python -m pytest -q                     # 34 tests: stats, reconciler golden values, ingest, provenance
+pip install -e ".[notebook]"            # matplotlib + jupyter
+jupyter nbconvert --to notebook --execute notebooks/assay_walkthrough.ipynb   # regenerate results/ + figures
 ```
 
-See [docs/survey.md](docs/survey.md) for the (dated, to-be-verified) competitive survey of
-what statistical machinery existing eval tools ship.
+Run the notebook to reproduce every figure on the site from the shipped fixtures; outputs
+land in [`results/`](results/) and are mirrored into `docs/figures/`. See
+[docs/survey.md](docs/survey.md) for the (dated, to-be-verified) competitive survey of what
+statistical machinery existing eval tools ship.
 
-## Provenance of this plan
+## How this was designed
 
 The design was produced by a multi-agent workflow: five domain researchers (benchmark bugs,
 eval statistics, real datasets, tooling gaps, trainable components), three competing project
-concepts scored by a three-lens judge panel (hiring-manager, skeptical-statistician,
-open-source-adoption), and one synthesis. The winning concept absorbed the strongest ideas
-from the other two. Details in [docs/plan.html](docs/plan.html).
+concepts scored by an independent three-lens judge panel, and one synthesis that absorbed the
+strongest ideas from the runners-up.
 
 ## License
 

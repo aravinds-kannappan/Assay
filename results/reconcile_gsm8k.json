@@ -1,0 +1,119 @@
+{
+  "n": 24,
+  "strict_acc": 0.5416666666666666,
+  "flexible_acc": 0.875,
+  "delta": 0.33333333333333337,
+  "recovered": 10,
+  "fooled": 2,
+  "paired_p_value": 0.03857421875,
+  "flips": [
+    {
+      "item_id": "g001",
+      "gold": "3",
+      "strict_pred": null,
+      "flexible_pred": "3",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g003",
+      "gold": "5",
+      "strict_pred": null,
+      "flexible_pred": "5",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g005",
+      "gold": "8",
+      "strict_pred": null,
+      "flexible_pred": "8",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g007",
+      "gold": "29",
+      "strict_pred": null,
+      "flexible_pred": "29",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g009",
+      "gold": "48",
+      "strict_pred": null,
+      "flexible_pred": "48",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g011",
+      "gold": "7",
+      "strict_pred": null,
+      "flexible_pred": "7",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g013",
+      "gold": "70",
+      "strict_pred": null,
+      "flexible_pred": "70",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g015",
+      "gold": "25",
+      "strict_pred": "25",
+      "flexible_pred": "3",
+      "strict_correct": true,
+      "flexible_correct": false,
+      "reason": "flexible grabbed trailing distractor '3'; strict matched the delimited answer '25'"
+    },
+    {
+      "item_id": "g016",
+      "gold": "12",
+      "strict_pred": "12",
+      "flexible_pred": "6",
+      "strict_correct": true,
+      "flexible_correct": false,
+      "reason": "flexible grabbed trailing distractor '6'; strict matched the delimited answer '12'"
+    },
+    {
+      "item_id": "g017",
+      "gold": "2",
+      "strict_pred": null,
+      "flexible_pred": "2",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g020",
+      "gold": "11",
+      "strict_pred": null,
+      "flexible_pred": "11",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    },
+    {
+      "item_id": "g022",
+      "gold": "64",
+      "strict_pred": null,
+      "flexible_pred": "64",
+      "strict_correct": false,
+      "flexible_correct": true,
+      "reason": "no '####' delimiter emitted; strict-match found nothing, flexible recovered the trailing number"
+    }
+  ]
+}
