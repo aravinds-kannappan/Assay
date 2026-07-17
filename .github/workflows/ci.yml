@@ -20,16 +20,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
-      - name: Regenerate fixtures (must match committed files)
+      - name: Regenerate deterministic fixtures (must match committed files)
         run: |
           python examples/make_fixtures.py
-          git diff --exit-code examples/*.jsonl
+          git diff --exit-code examples/gsm8k_frozen.jsonl examples/sample_lm_eval.jsonl
       - name: Run tests
         run: python -m pytest -q
       - name: Golden reconcile check
         run: |
           assay reconcile gsm8k examples/gsm8k_frozen.jsonl --json > /tmp/recon.json
           python -c "import json; d=json.load(open('/tmp/recon.json')); assert d['strict_acc']==13/24 and d['flexible_acc']==21/24, d; print('golden reconcile OK: %.2f -> %.2f' % (d['strict_acc'], d['flexible_acc']))"
+      - name: Gate verdict check (the underpowered PR)
+        run: |
+          assay gate examples/gate_baseline.jsonl examples/gate_candidate.jsonl --cluster-field task --json > /tmp/gate.json
+          python -c "import json; d=json.load(open('/tmp/gate.json')); assert d['verdict'].startswith('underpowered') and abs(d['delta']-0.02)<1e-9, d; print('gate OK: %s (delta %.1f pts, MDE %.1f pts)' % (d['verdict'], d['delta']*100, d['mde']*100))"
+      - name: IRT parameter recovery smoke check
+        run: |
+          assay irt fit examples/irt_outcomes.jsonl --subset 5
       - name: Provenance discipline (every number tagged)
         run: |
           assay check examples/sample_lm_eval.jsonl --cluster-field subject --json > /tmp/check.json

@@ -1,0 +1,86 @@
+name: "Assay significance gate"
+description: "Annotate a pull request with a significance verdict comparing a baseline and candidate eval run."
+branding:
+  icon: "bar-chart-2"
+  color: "green"
+
+inputs:
+  baseline:
+    description: "Path to the baseline run's per-sample JSONL (lm-eval --log_samples format)."
+    required: true
+  candidate:
+    description: "Path to the candidate run's per-sample JSONL."
+    required: true
+  cluster-field:
+    description: "Grouping field for a cluster-aware paired test (e.g. subject, task, repo). Empty = exact McNemar."
+    required: false
+    default: ""
+  metric:
+    description: "Score column to use (auto-detected if empty)."
+    required: false
+    default: ""
+  alpha:
+    description: "Significance level."
+    required: false
+    default: "0.05"
+  power:
+    description: "Target power for the minimum-detectable-effect calculation."
+    required: false
+    default: "0.8"
+  fail-on-underpowered:
+    description: "Fail the check when the claimed delta is inside the noise floor."
+    required: false
+    default: "false"
+  fail-on-regression:
+    description: "Fail the check on a statistically significant regression."
+    required: false
+    default: "true"
+  comment:
+    description: "Post the verdict as a pull-request comment."
+    required: false
+    default: "true"
+  install:
+    description: "pip target for assay. Defaults to the PyPI package; pass '.' to use the checked-out repo."
+    required: false
+    default: "assay-evals"
+
+outputs:
+  verdict:
+    description: "significant improvement | significant regression | underpowered | not significant"
+    value: ${{ steps.gate.outputs.verdict }}
+  delta_pts:
+    description: "candidate minus baseline accuracy, in points"
+    value: ${{ steps.gate.outputs.delta_pts }}
+  mde_pts:
+    description: "minimum detectable effect at this eval size, in points"
+    value: ${{ steps.gate.outputs.mde_pts }}
+  significant:
+    description: "true if the paired test rejects at alpha"
+    value: ${{ steps.gate.outputs.significant }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install assay
+      shell: bash
+      run: python -m pip install --upgrade pip && python -m pip install "${{ inputs.install }}"
+    - name: Run gate
+      id: gate
+      shell: bash
+      run: |
+        args="--github --md \"$RUNNER_TEMP/assay_gate.md\" --alpha ${{ inputs.alpha }} --power ${{ inputs.power }}"
+        [ -n "${{ inputs.cluster-field }}" ] && args="$args --cluster-field ${{ inputs.cluster-field }}"
+        [ -n "${{ inputs.metric }}" ] && args="$args --metric ${{ inputs.metric }}"
+        [ "${{ inputs.fail-on-underpowered }}" = "true" ] && args="$args --fail-on-underpowered"
+        [ "${{ inputs.fail-on-regression }}" = "true" ] && args="$args --fail-on-regression"
+        eval assay gate "\"${{ inputs.baseline }}\"" "\"${{ inputs.candidate }}\"" $args
+    - name: Comment on the pull request
+      if: always() && inputs.comment == 'true' && github.event_name == 'pull_request'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: gh pr comment "${{ github.event.pull_request.number }}" --body-file "$RUNNER_TEMP/assay_gate.md"

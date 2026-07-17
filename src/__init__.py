@@ -13,16 +13,22 @@ from __future__ import annotations
 
 __version__ = "0.1.0"
 
-from . import check, provenance, schema, stats
+from . import check, gate, irt, provenance, schema, stats
+from .gate import run_gate
 from .ingest import load_lm_eval_samples
+from .irt import fit_2pl
 from .reconcile import reconcile_gsm8k
 
 __all__ = [
     "__version__",
     "check",
+    "gate",
+    "irt",
     "provenance",
     "schema",
     "stats",
     "load_lm_eval_samples",
     "reconcile_gsm8k",
+    "run_gate",
+    "fit_2pl",
 ]

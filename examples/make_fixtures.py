@@ -19,6 +19,8 @@ from __future__ import annotations
 import json
 import os
 
+import numpy as np
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -103,8 +105,66 @@ def write_lm_eval() -> str:
     return path
 
 
+# --- gate: two checkpoints over 200 shared items -------------------------
+# Baseline ~70% accuracy; the candidate flips 10 items right and 6 wrong for a
+# net +2.0 pts. That is a small gain over a 200-item eval, so the gate should
+# read it as UNDERPOWERED (the delta is below the eval's noise floor).
+N_GATE = 200
+TASKS = [f"task{i}" for i in range(5)]
+
+
+def _gate_scores(seed=17):
+    rng = np.random.default_rng(seed)
+    baseline = (rng.random(N_GATE) < 0.70)
+    wrong = np.where(~baseline)[0]
+    right = np.where(baseline)[0]
+    rng.shuffle(wrong)
+    rng.shuffle(right)
+    candidate = baseline.copy()
+    candidate[wrong[:10]] = True    # 10 genuine gains
+    candidate[right[:6]] = False    # 6 genuine losses  -> net +4 items = +2.0 pts
+    tasks = [TASKS[i % len(TASKS)] for i in range(N_GATE)]
+    return baseline.astype(int), candidate.astype(int), tasks
+
+
+def _write_checkpoint(path, scores, tasks):
+    with open(path, "w", encoding="utf-8") as fh:
+        for i, (acc, task) in enumerate(zip(scores, tasks)):
+            fh.write(json.dumps({
+                "doc_id": f"g{i:03d}",
+                "doc": {"task": task, "question": f"item {i} (illustrative fixture)"},
+                "acc": int(acc),
+                "arguments": [[f"prompt::{i}", "A"]],
+            }) + "\n")
+    return path
+
+
+def write_gate():
+    base, cand, tasks = _gate_scores()
+    p1 = _write_checkpoint(os.path.join(HERE, "gate_baseline.jsonl"), base, tasks)
+    p2 = _write_checkpoint(os.path.join(HERE, "gate_candidate.jsonl"), cand, tasks)
+    return p1, p2
+
+
+# --- IRT: a (models x items) outcome matrix from known 2PL parameters -----
+# Simulated from a known ground truth so the fitter can be validated by
+# parameter recovery. The truth is saved alongside for the test suite.
+def write_irt(seed=7, n_models=60, n_items=120):
+    from assay import irt
+    rng = np.random.default_rng(seed)
+    theta = np.sort(rng.normal(0, 1, n_models))
+    b = rng.normal(0, 1.2, n_items)
+    a = np.exp(rng.normal(0.0, 0.4, n_items))  # lognormal discriminations in ~[0.5, 2]
+    Y, _ = irt.simulate_2pl(theta, a, b, seed=seed)
+    out = os.path.join(HERE, "irt_outcomes.jsonl")
+    with open(out, "w", encoding="utf-8") as fh:
+        for m in range(n_models):
+            fh.write(json.dumps({"model": f"m{m:02d}", "scores": [int(x) for x in Y[m]]}) + "\n")
+    truth = os.path.join(HERE, "irt_truth.json")
+    json.dump({"theta": theta.tolist(), "a": a.tolist(), "b": b.tolist()}, open(truth, "w"))
+    return out, truth
+
+
 if __name__ == "__main__":
-    p1 = write_gsm8k()
-    p2 = write_lm_eval()
-    print("wrote", p1)
-    print("wrote", p2)
+    for p in (write_gsm8k(), write_lm_eval(), *write_gate(), *write_irt()):
+        print("wrote", p)

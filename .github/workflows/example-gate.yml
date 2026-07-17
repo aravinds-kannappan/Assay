@@ -1,0 +1,26 @@
+# Example: run the Assay significance gate on a pull request.
+# On every PR this posts a verdict comparing the two example checkpoints, which
+# are constructed to show an UNDERPOWERED result (+2 pts over 200 items).
+name: example-gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write   # needed to post the verdict comment
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assay significance gate
+        uses: ./.github/actions/assay-gate
+        with:
+          baseline: examples/gate_baseline.jsonl
+          candidate: examples/gate_candidate.jsonl
+          cluster-field: task
+          install: "."            # use the checked-out repo (PyPI target once published)
+          fail-on-underpowered: "false"   # demo only: report, do not block
+          comment: "true"

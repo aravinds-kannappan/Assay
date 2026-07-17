@@ -1,0 +1,9 @@
+# Keep GitHub's language stats focused on the actual Python package.
+# The executed notebook embeds figure outputs (base64 PNGs), which would
+# otherwise make "Jupyter Notebook" dominate the language bar. Python is the
+# real codebase; the notebook and the website are documentation.
+*.ipynb linguist-documentation
+docs/**  linguist-documentation
+results/** linguist-documentation
+examples/*.jsonl linguist-generated
+*.png binary
