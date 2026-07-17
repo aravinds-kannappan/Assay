@@ -20,6 +20,24 @@
   "mde_n200_p0.7_pts": 9.078173671541288,
   "required_n_2pt": {
     "unpaired": 4906,
-    "paired_10pct_disagreement": 1963
+    "paired_10pct": 1963
+  },
+  "gate": {
+    "delta_pts": 2.0000000000000018,
+    "mde_pts": 5.603170436225937,
+    "verdict": "underpowered: delta below the noise floor",
+    "p_value": 0.10247043485974941,
+    "items_needed": 1570
+  },
+  "irt": {
+    "n_models": 60,
+    "n_items": 120,
+    "recover_theta_r": 0.9687047015741738,
+    "recover_b_r": 0.9069770577116439,
+    "raw_vs_theta_r": 0.9930887141845645,
+    "fast_subset_rmse_k20": {
+      "fisher": 0.1735787668533702,
+      "random": 0.30073059179045225
+    }
   }
 }

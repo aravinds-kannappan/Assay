@@ -22,5 +22,5 @@ The illustrative GSM8K gap here (~33 pts) is deliberately exaggerated to make th
 mechanism obvious. The **real** reproduction runs on actual model generations and
 recovers the documented ~8-point strict-vs-flexible gap. Assay's real audits use
 public datasets only (Open LLM Leaderboard details, GSM8K-Platinum, MMLU-Redux,
-HELM logs); see the [project site](https://aravinds-kannappan.github.io/NoiseFloor/#methods).
+HELM logs); see the [project site](https://aravinds-kannappan.github.io/Assay/#methods).
 Nothing in this folder should ever be reported as a finding.
