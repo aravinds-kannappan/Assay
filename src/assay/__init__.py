@@ -1,0 +1,28 @@
+"""Assay: the noise floor for LLM evals.
+
+An analytical-chemistry take on eval measurement. Assay ingests the per-sample
+logs your harness already writes and turns bare point estimates into
+decision-grade measurements: clustered error bars, cluster-aware paired tests, a
+pre-flight minimum-detectable-effect gate, and a cross-harness reconciler that
+pins a score gap on the exact rule that caused it.
+
+Every number Assay reports carries one of four provenance tags:
+deterministic, statistically estimated, trained-model, or LLM-judged.
+"""
+from __future__ import annotations
+
+__version__ = "0.1.0"
+
+from . import check, provenance, schema, stats
+from .ingest import load_lm_eval_samples
+from .reconcile import reconcile_gsm8k
+
+__all__ = [
+    "__version__",
+    "check",
+    "provenance",
+    "schema",
+    "stats",
+    "load_lm_eval_samples",
+    "reconcile_gsm8k",
+]

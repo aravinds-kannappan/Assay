@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Regenerate fixtures (must match committed files)
+        run: |
+          python examples/make_fixtures.py
+          git diff --exit-code examples/*.jsonl
+      - name: Run tests
+        run: python -m pytest -q
+      - name: Golden reconcile check
+        run: |
+          assay reconcile gsm8k examples/gsm8k_frozen.jsonl --json > /tmp/recon.json
+          python -c "import json; d=json.load(open('/tmp/recon.json')); assert d['strict_acc']==13/24 and d['flexible_acc']==21/24, d; print('golden reconcile OK: %.2f -> %.2f' % (d['strict_acc'], d['flexible_acc']))"
+      - name: Provenance discipline (every number tagged)
+        run: |
+          assay check examples/sample_lm_eval.jsonl --cluster-field subject --json > /tmp/check.json
+          python -c "from assay.provenance import assert_all_tagged; import json; assert_all_tagged(json.load(open('/tmp/check.json'))); print('all numbers carry a provenance tag')"

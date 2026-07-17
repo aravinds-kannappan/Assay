@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# envs
+.venv/
+venv/
+env/
+
+# data caches (real audit data is downloaded, never committed)
+data/
+*.parquet
+!examples/*.parquet
+
+# os
+.DS_Store
