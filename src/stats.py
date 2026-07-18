@@ -342,3 +342,48 @@ def spearman(x: Sequence[float], y: Sequence[float]) -> tuple[float, float]:
         raise ValueError("x and y must have equal length")
     res = sps.spearmanr(list(x), list(y))
     return float(res.statistic), float(res.pvalue)
+
+
+def pearson(x: Sequence[float], y: Sequence[float]) -> tuple[float, float]:
+    """Pearson correlation and its p-value (wraps scipy). Returns (r, p)."""
+    if len(list(x)) != len(list(y)):
+        raise ValueError("x and y must have equal length")
+    res = sps.pearsonr(list(x), list(y))
+    return float(res.statistic), float(res.pvalue)
+
+
+# ---- distributional shift (judge scores vs human scores) ------------------
+
+def ks_test(a: Sequence[float], b: Sequence[float]) -> tuple[float, float]:
+    """Two-sample Kolmogorov-Smirnov test. Returns (statistic, p_value).
+
+    Asks whether two samples (e.g. a judge's 1-5 scores and the human scores on
+    the same items) are drawn from the same distribution. A small p rejects "same".
+    """
+    res = sps.ks_2samp(list(a), list(b))
+    return float(res.statistic), float(res.pvalue)
+
+
+def wasserstein(a: Sequence[float], b: Sequence[float]) -> float:
+    """1-D Wasserstein (earth-mover) distance between two score distributions.
+
+    Unlike KS (a max gap), Wasserstein measures how far the whole distribution
+    must move, so it captures the *size* of a leniency shift, not just its presence.
+    """
+    return float(sps.wasserstein_distance(list(a), list(b)))
+
+
+def mean_bias(judge: Sequence[float], human: Sequence[float]) -> float:
+    """Mean(judge) - mean(human): positive means the judge scores higher than
+    humans on average (leniency / score inflation)."""
+    j = np.asarray(list(judge), dtype=float); h = np.asarray(list(human), dtype=float)
+    return float(j.mean() - h.mean())
+
+
+def cohens_d(a: Sequence[float], b: Sequence[float]) -> float:
+    """Standardized mean difference (mean(a)-mean(b)) / pooled SD. A scale-free
+    effect size for how far a judge's scores sit from the human scores."""
+    a = np.asarray(list(a), dtype=float); b = np.asarray(list(b), dtype=float)
+    na, nb = a.size, b.size
+    sp = math.sqrt(((na - 1) * a.var(ddof=1) + (nb - 1) * b.var(ddof=1)) / max(na + nb - 2, 1))
+    return float((a.mean() - b.mean()) / sp) if sp > 0 else 0.0
