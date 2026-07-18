@@ -132,6 +132,42 @@
   footer{border-top:1px solid var(--hair-2);padding:26px 0;color:var(--muted);font-family:var(--mono);font-size:12.5px}
   footer a{color:var(--muted)}
   .note{font-size:13px;color:var(--muted);border-left:2px solid var(--hair-2);padding-left:12px;margin-top:16px}
+
+  /* judge explorer + harness */
+  .pipeline{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin-top:16px}
+  .pstep{background:var(--panel);border:1px solid var(--hair-2);border-radius:10px;padding:11px 13px;font-weight:700;font-size:13px;flex:1;min-width:130px;box-shadow:var(--shadow)}
+  .pstep span{display:block;font-weight:500;font-size:11.5px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+  .parrow{display:flex;align-items:center;color:var(--muted);font-size:18px}
+  @media (max-width:700px){.parrow{display:none}.pstep{min-width:100%}}
+  .jx-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .jx-btn{font-family:var(--mono);font-size:12.5px;color:var(--ink);background:var(--panel);border:1px solid var(--hair-2);border-radius:8px;padding:7px 12px;cursor:pointer}
+  .jx-btn:hover{border-color:var(--signal)}
+  #jx-select{max-width:340px}
+  .jx-meta{color:var(--muted)}
+  .jx-prompt{background:var(--panel);border:1px solid var(--hair-2);border-radius:10px;padding:14px 16px;margin-top:16px;box-shadow:var(--shadow)}
+  .jx-prompt .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .jx-prompt .txt{margin-top:6px;white-space:pre-wrap;font-size:14.5px;color:var(--ink)}
+  .jx-resp{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media (max-width:720px){.jx-resp{grid-template-columns:1fr}}
+  .jx-card{background:var(--card);border:1px solid var(--hair-2);border-radius:10px;padding:14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .jx-card.win-human{border-color:color-mix(in srgb,var(--signal) 55%,var(--hair-2))}
+  .jx-card .side{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .jx-card .model{font-weight:700;font-size:14px;margin-top:3px;word-break:break-word}
+  .jx-card .badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .jx-card .txt{margin-top:10px;white-space:pre-wrap;font-size:13px;color:var(--ink-soft);max-height:230px;overflow:auto}
+  .jx-badge{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;padding:2px 7px;border-radius:5px}
+  .jx-badge.human{color:#fff;background:var(--signal)}
+  .jx-badge.panel{color:var(--signal);background:var(--signal-wash);border:1px solid color-mix(in srgb,var(--signal) 35%,transparent)}
+  .jx-panel{margin-top:16px;background:var(--panel);border:1px solid var(--hair-2);border-radius:10px;padding:12px 16px;font-family:var(--mono);font-size:13px;box-shadow:var(--shadow)}
+  .jx-judges{margin-top:14px;display:flex;flex-direction:column;gap:1px;border:1px solid var(--hair-2);border-radius:10px;overflow:hidden}
+  .jx-judge{display:grid;grid-template-columns:150px 92px 1fr;gap:12px;padding:10px 14px;background:var(--panel);align-items:start}
+  @media (max-width:640px){.jx-judge{grid-template-columns:1fr;gap:3px}}
+  .jx-judge .jm{font-family:var(--mono);font-size:12px;font-weight:700;word-break:break-word}
+  .jx-judge .jm small{display:block;color:var(--muted);font-weight:500;font-size:10.5px}
+  .jx-pick{font-family:var(--mono);font-size:11.5px;font-weight:700}
+  .jx-pick.correct{color:var(--signal)} .jx-pick.wrong{color:var(--crit)} .jx-pick.flip{color:var(--warn)}
+  .jx-reason{font-size:13px;color:var(--ink-soft)}
+  .jx-dots{color:var(--signal);letter-spacing:1px;font-size:11px}
 </style>
 </head>
 <body>
@@ -143,6 +179,7 @@
       <button role="tab" aria-selected="false" data-tab="problem">the problem</button>
       <button role="tab" aria-selected="false" data-tab="demo">live demo</button>
       <button role="tab" aria-selected="false" data-tab="results">results</button>
+      <button role="tab" aria-selected="false" data-tab="judge">judge explorer</button>
       <button role="tab" aria-selected="false" data-tab="methods">methods</button>
       <button role="tab" aria-selected="false" data-tab="roadmap">roadmap</button>
     </nav>
@@ -320,6 +357,43 @@
       The fixtures are labeled synthetic and demonstrate the method, not a finding.</p>
   </section>
 
+  <!-- JUDGE EXPLORER -->
+  <section class="panel" id="judge" role="tabpanel">
+    <div class="eyebrow">the llm judge</div>
+    <h2>See the judges think</h2>
+    <p class="sub">10 models from 7 providers judged 100 real Chatbot Arena items, blind, in both A/B orderings.
+      Read the actual responses (with the real model names revealed) and every judge's pick, confidence, and
+      one-line reasoning. Why A/B and not model names during judging? The judges are kept blind to identity to
+      avoid self-preference bias; the names are revealed only here, afterwards.</p>
+
+    <div class="eyebrow lead-space">harness &amp; scaffolding</div>
+    <div class="pipeline">
+      <div class="pstep">100 Arena items<span>prompt + 2 responses + human vote</span></div>
+      <div class="parrow">&rarr;</div>
+      <div class="pstep">panel: 10 judges &times; 2 orderings<span>2,000 blind calls</span></div>
+      <div class="parrow">&rarr;</div>
+      <div class="pstep">parse + debias<span>flexible JSON, fold BA to AB</span></div>
+      <div class="parrow">&rarr;</div>
+      <div class="pstep">aggregate<span>panel vote (PoLL)</span></div>
+      <div class="parrow">&rarr;</div>
+      <div class="pstep">validate<span>kappa, position bias, verbosity</span></div>
+    </div>
+    <p class="note">The 2,000 calls were run by a fleet of 25 subagents (one per 4-item chunk), each making the real
+      model calls through the Orthogonal MCP and writing verdicts to disk. Harness code:
+      <span class="mono">assay.judge.run_panel</span>, <span class="mono">scripts/run_judge_study.py</span>. Every
+      judgment is <span class="chip llm">LLM-judged</span>; the statistics on top are
+      <span class="chip stat">statistically estimated</span>.</p>
+
+    <div class="eyebrow lead-space">explore an item</div>
+    <div class="jx-bar">
+      <button id="jx-prev" class="jx-btn">&larr; prev</button>
+      <select id="jx-select" aria-label="pick an item"></select>
+      <button id="jx-next" class="jx-btn">next &rarr;</button>
+      <span id="jx-meta" class="jx-meta mono"></span>
+    </div>
+    <div id="jx-body"><p class="note" id="jx-loading">Loading judged items&hellip;</p></div>
+  </section>
+
   <!-- METHODS -->
   <section class="panel" id="methods" role="tabpanel">
     <div class="eyebrow">methods</div>
@@ -399,6 +473,7 @@
     panels.forEach(function(p){p.classList.toggle('active', p.id===id);});
     if (history.replaceState) history.replaceState(null,'','#'+id);
     if (id==='demo') draw();
+    if (id==='judge') jxInit();
   }
   tabs.forEach(function(t){t.addEventListener('click', function(){show(t.dataset.tab);});});
   var start = (location.hash||'').replace('#','');
@@ -463,6 +538,71 @@
   }
   ['input','change'].forEach(function(ev){Object.values(el).forEach(function(c){c.addEventListener(ev,draw);});});
   draw();
+
+  // --- judge explorer ---
+  var jxData=null, jxIdx=0;
+  function mk(tag,cls,txt){var e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e;}
+  function shortName(m){return String(m).split('/').pop();}
+  function jxInit(){
+    if(jxData!==null) return;
+    jxData='loading';
+    fetch('judge_explorer.json').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){
+      jxData=d; buildSelect(); renderItem(0);
+    }).catch(function(){ jxData=null;
+      var l=document.getElementById('jx-loading'); if(l) l.textContent='Judged-item data is being generated; check back shortly.';
+    });
+  }
+  function buildSelect(){
+    var sel=document.getElementById('jx-select'); sel.innerHTML='';
+    jxData.items.forEach(function(it,i){
+      var o=document.createElement('option'); o.value=i;
+      o.textContent=(i+1)+'. '+it.prompt.slice(0,58).replace(/\s+/g,' ');
+      sel.appendChild(o);
+    });
+    sel.onchange=function(){jxIdx=+sel.value; renderItem(jxIdx);};
+    document.getElementById('jx-prev').onclick=function(){jxIdx=(jxIdx-1+jxData.items.length)%jxData.items.length; sel.value=jxIdx; renderItem(jxIdx);};
+    document.getElementById('jx-next').onclick=function(){jxIdx=(jxIdx+1)%jxData.items.length; sel.value=jxIdx; renderItem(jxIdx);};
+  }
+  function renderItem(i){
+    jxIdx=i; var it=jxData.items[i]; var body=document.getElementById('jx-body'); body.innerHTML='';
+    document.getElementById('jx-meta').textContent='item '+(i+1)+' / '+jxData.items.length+'  ·  human preferred '+shortName(it.human==='A'?it.model_a:it.model_b);
+    var pw=mk('div','jx-prompt'); pw.appendChild(mk('div','k','user prompt')); pw.appendChild(mk('div','txt',it.prompt)); body.appendChild(pw);
+    var rr=mk('div','jx-resp');
+    [['A',it.model_a,it.response_a],['B',it.model_b,it.response_b]].forEach(function(x){
+      var side=x[0], c=mk('div','jx-card'+(it.human===side?' win-human':''));
+      c.appendChild(mk('div','side','Response '+side));
+      c.appendChild(mk('div','model',shortName(x[1])));
+      var b=mk('div','badges');
+      if(it.human===side) b.appendChild(mk('span','jx-badge human','human pick'));
+      if(it.panel && it.panel.panel_preferred===side){
+        var v=side==='A'?it.panel.votes_a:it.panel.votes_b, tot=it.panel.votes_a+it.panel.votes_b;
+        b.appendChild(mk('span','jx-badge panel','panel pick ('+v+'/'+tot+')'));
+      }
+      c.appendChild(b); c.appendChild(mk('div','txt',x[2])); rr.appendChild(c);
+    });
+    body.appendChild(rr);
+    if(it.panel){
+      var ps=mk('div','jx-panel'); var pp=it.panel.panel_preferred;
+      ps.textContent='panel verdict: '+(pp==='A'?shortName(it.model_a):pp==='B'?shortName(it.model_b):'no majority')+
+        '   votes A/B = '+it.panel.votes_a+'/'+it.panel.votes_b+'   '+it.panel.n_abstain+' abstained (order-flip)';
+      body.appendChild(ps);
+    }
+    var jl=mk('div','jx-judges');
+    it.judges.forEach(function(j){
+      var row=mk('div','jx-judge');
+      var jm=mk('div','jm'); jm.appendChild(document.createTextNode(shortName(j.model))); jm.appendChild(mk('small',null,j.provider||'')); row.appendChild(jm);
+      var pickTxt, cls;
+      if(j.final==='tie' || !j.final){ pickTxt=(j.final==='tie'?'order-flip':'no verdict'); cls='flip'; }
+      else { pickTxt=(j.final===it.human?'✓ ':'✗ ')+shortName(j.final==='A'?it.model_a:it.model_b); cls=(j.final===it.human?'correct':'wrong'); }
+      var pk=mk('div','jx-pick '+cls, pickTxt);
+      if(j.confidence){ pk.appendChild(mk('span','jx-dots',' '+'●'.repeat(Math.max(1,Math.min(5,j.confidence))))); }
+      row.appendChild(pk);
+      row.appendChild(mk('div','jx-reason', j.reasoning || '(no reasoning returned)'));
+      jl.appendChild(row);
+    });
+    body.appendChild(jl);
+  }
+  window.jxInit=jxInit;
 })();
 </script>
 </body>
