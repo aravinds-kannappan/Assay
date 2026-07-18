@@ -1,0 +1,113 @@
+{
+  "compiled": "live via Serper Google Scholar",
+  "queries": {
+    "llm_judge_bias": [
+      {
+        "title": "Judging the judges: A systematic study of position bias in LLM-as-a-judge",
+        "year": 2025,
+        "citedBy": 288,
+        "link": "https://aclanthology.org/2025.ijcnlp-long.18/"
+      },
+      {
+        "title": "Judging the judges: Evaluating alignment and vulnerabilities in LLMs-as-judges",
+        "year": 2025,
+        "citedBy": 269,
+        "link": "https://aclanthology.org/2025.gem-1.33/"
+      },
+      {
+        "title": "Are We on the Right Way to Assessing LLM-as-a-Judge?",
+        "year": 2025,
+        "citedBy": 16,
+        "link": "https://arxiv.org/abs/2512.16041"
+      },
+      {
+        "title": "Any large language model can be a reliable judge: Debiasing with a reasoning-based bias detector",
+        "year": 2026,
+        "citedBy": 9,
+        "link": "https://proceedings.neurips.cc/paper_files/paper/2025/hash/095c7a06f229943c46bd0b519edf20f9-Abstract-Conference.html"
+      },
+      {
+        "title": "Reliability without Validity: A Systematic, Large-Scale Evaluation of LLM-as-a-Judge Models",
+        "year": 2026,
+        "link": "https://arxiv.org/abs/2606.19544"
+      }
+    ],
+    "contamination": [
+      {
+        "title": "LiveCodeBench: Holistic and contamination free evaluation of LLMs for code",
+        "year": 2025,
+        "citedBy": 1824,
+        "link": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/94074dd5a072d28ff75a76dabed43767-Abstract-Conference.html"
+      },
+      {
+        "title": "NLP evaluation in trouble: On the need to measure LLM data contamination for each benchmark",
+        "year": 2023,
+        "citedBy": 434,
+        "link": "https://aclanthology.org/2023.findings-emnlp.722/"
+      },
+      {
+        "title": "Investigating data contamination in modern benchmarks for large language models",
+        "year": 2024,
+        "citedBy": 303,
+        "link": "https://aclanthology.org/2024.naacl-long.482/"
+      },
+      {
+        "title": "Benchmarking LLMs under data contamination: A survey from static to dynamic evaluation",
+        "year": 2025,
+        "citedBy": 30,
+        "link": "https://aclanthology.org/2025.emnlp-main.511/"
+      }
+    ],
+    "eval_statistics": [
+      {
+        "title": "Adding error bars to evals: A statistical approach to language model evaluations (Miller)",
+        "year": 2024,
+        "citedBy": 95,
+        "link": "https://arxiv.org/abs/2411.00640"
+      },
+      {
+        "title": "Position: Don't Use the CLT in LLM Evals With Fewer Than a Few Hundred Datapoints",
+        "year": 2025,
+        "citedBy": 21,
+        "link": "https://arxiv.org/abs/2503.01747"
+      },
+      {
+        "title": "Handling Missing Responses under Cluster Dependence with Applications to LM Evaluation",
+        "year": 2026,
+        "link": "https://proceedings.neurips.cc/paper_files/paper/2025/hash/51b81a56ec2c9dbc0649d44fb49ddb27-Abstract-Conference.html"
+      },
+      {
+        "title": "On Measuring LLM Performance with Inferential Statistics",
+        "year": 2025,
+        "citedBy": 5,
+        "link": "https://www.mdpi.com/2078-2489/16/9/817"
+      }
+    ],
+    "irt_efficient_eval": [
+      {
+        "title": "tinyBenchmarks: evaluating LLMs with fewer examples",
+        "year": 2024,
+        "citedBy": 144,
+        "link": "https://arxiv.org/abs/2402.14992"
+      },
+      {
+        "title": "Adaptive Testing for LLM Evaluation: A Psychometric Alternative to Static Benchmarks",
+        "year": 2025,
+        "citedBy": 16,
+        "link": "https://arxiv.org/abs/2511.04689"
+      },
+      {
+        "title": "Lost in benchmarks? Rethinking LLM benchmarking with item response theory",
+        "year": 2026,
+        "citedBy": 36,
+        "link": "https://ojs.aaai.org/index.php/AAAI/article/view/40814"
+      },
+      {
+        "title": "Learning Compact Representations of LLM Abilities via Item Response Theory",
+        "year": 2025,
+        "citedBy": 4,
+        "link": "https://arxiv.org/abs/2510.00844"
+      }
+    ]
+  }
+}

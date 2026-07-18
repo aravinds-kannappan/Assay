@@ -1,0 +1,16 @@
+{
+  "dataset": "edinburgh-dawg/mmlu-redux-2.0",
+  "n_items": 5700,
+  "n_flagged": 370,
+  "overall_error_rate": 0.0649,
+  "virology_error_rate": 0.57,
+  "top_error_configs": {
+    "virology": 0.57,
+    "logical_fallacies": 0.26,
+    "college_chemistry": 0.25,
+    "human_sexuality": 0.19,
+    "professional_law": 0.18,
+    "business_ethics": 0.15
+  },
+  "provenance": "deterministic (recomputed live from HF datasets-server)"
+}

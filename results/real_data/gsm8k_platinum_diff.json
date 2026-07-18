@@ -1,0 +1,6 @@
+{
+  "gsm8k_test": 1319,
+  "gsm8k_platinum_test": 1209,
+  "items_removed_or_changed": 110,
+  "provenance": "deterministic (live HF row counts)"
+}

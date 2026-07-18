@@ -35,3 +35,36 @@ Notes and honesty caveats:
   be credited as such.
 - Assay is deliberately a *layer*, not a runner: the comparison is about statistical
   machinery, not about who executes the model.
+
+---
+
+## Recent literature (pulled live via Serper Scholar + You.com)
+
+The methods Assay implements are the ones the current literature converges on. Raw search
+output is saved in [`results/survey/`](../results/survey/). Selected sources:
+
+**Eval statistics.**
+- Miller, *Adding error bars to evals* (arXiv:2411.00640): CLT and clustered standard
+  errors, paired comparisons, power. The paper Assay's golden tests reproduce.
+- *Position: Don't Use the CLT in LLM Evals With Fewer Than a Few Hundred Datapoints*
+  (arXiv:2503.01747): motivates the small-cluster / bootstrap path.
+- *Handling Missing Responses under Cluster Dependence* (NeurIPS 2025): cluster structure
+  in eval estimation, the regime Assay's CR2 targets.
+
+**LLM-as-a-judge bias.**
+- *Judging the judges: A systematic study of position bias in LLM-as-a-judge*
+  (IJCNLP 2025, 288 citations): the exact position-bias effect `assay.judge` measures via
+  swap-and-average, and which the pilot found in Nemotron-Super.
+- *Are We on the Right Way to Assessing LLM-as-a-Judge?* (arXiv:2512.16041) and
+  *Judging the judges: alignment and vulnerabilities* (GEM 2025, 269 citations): verbosity
+  bias and human-agreement, mapped to `validate_judge`'s length correlation + Cohen's kappa.
+- A You.com synthesis of 2024-2026 practice (saved in `results/survey/you_research.json`)
+  independently prescribes the same toolkit: clustered SEs, order swap-and-average,
+  verbosity control, kappa calibration, and diverse-provider judge panels.
+
+**IRT / efficient evaluation.**
+- *tinyBenchmarks* (arXiv:2402.14992, 144 citations) and *Lost in benchmarks? Rethinking
+  LLM benchmarking with IRT* (AAAI 2026): the 2PL fast-subset approach `assay.irt` implements.
+
+**Contamination** (roadmap for `assay.audit`): *LiveCodeBench* (ICLR 2025) and the
+static-to-dynamic contamination survey (EMNLP 2025).

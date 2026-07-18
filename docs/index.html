@@ -226,6 +226,9 @@
         <p>MMLU-Redux 2.0 finds a 6.49% error rate (57% in Virology). GSM8K-Platinum removed 110 of 1,319 items.
           Corrected sets change who wins.</p></div>
     </div>
+    <p class="note">Re-derived live, not quoted: pulling MMLU-Redux 2.0 from HuggingFace gives exactly a
+      <b>6.49%</b> error rate (Virology 57%), and GSM8K to GSM8K-Platinum is exactly <b>110</b> items removed.
+      Numbers in <span class="mono">results/real_data/</span>.</p>
 
     <div class="divider"></div>
     <div class="eyebrow">the reconciler, on the demo fixture</div>
@@ -304,6 +307,14 @@
       <figure class="figcard"><img src="figures/figJ2_judge_agreement.png" alt="10 by 10 judge-judge agreement heatmap.">
         <figcaption><b>Fig J2.</b> Judge-judge agreement on the pilot items. The module runs the full study against human labels; see results/judge.</figcaption></figure>
     </div>
+    <figure class="figcard lead-space">
+      <div class="eyebrow">interactive (Tako)</div>
+      <iframe src="https://trytako.com/embed/bm0M0rRsbVgWGbbEJTD_/" title="Judge order-consistency, interactive"
+        style="width:100%;height:440px;border:0;border-radius:8px;margin-top:10px" loading="lazy"></iframe>
+      <figcaption><b>Interactive.</b> The judge order-consistency chart as a live Tako card, generated from the pilot
+        data. If the embed does not load, the static copy is <span class="mono">figures/tako_judge_position_bias.png</span>
+        and the card is at <a href="https://trytako.com/card/bm0M0rRsbVgWGbbEJTD_/" target="_blank" rel="noopener">trytako.com</a>.</figcaption>
+    </figure>
     <p class="note">Outputs written alongside the figures: <span class="mono">reconcile_gsm8k.json</span>,
       <span class="mono">check_mmlu_fixture.json</span>, <span class="mono">mde_table.csv</span>, <span class="mono">summary.json</span>.
       The fixtures are labeled synthetic and demonstrate the method, not a finding.</p>
