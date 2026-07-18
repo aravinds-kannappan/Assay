@@ -113,6 +113,38 @@ def test_validate_length_correlation():
     assert rep.length_correlation is None or rep.length_correlation >= 0  # A longer, A preferred
 
 
+def test_panel_verdict_majority():
+    from assay.judge import panel_verdict
+    v = panel_verdict(["A", "A", "B", "A", "tie"])
+    assert v["panel_preferred"] == "A"
+    assert v["votes_a"] == 3 and v["votes_b"] == 1 and v["n_abstain"] == 1
+    assert v["agreement"] == pytest.approx(3 / 4)
+    assert not v["unanimous"]
+
+
+def test_panel_verdict_unanimous_and_empty():
+    from assay.judge import panel_verdict
+    assert panel_verdict(["B", "B", "B"])["unanimous"] is True
+    empty = panel_verdict(["tie", "tie"])
+    assert empty["panel_preferred"] is None and empty["n_abstain"] == 2
+
+
+def test_run_panel_aggregates():
+    from assay.judge import run_panel
+    # A content-aware backend that prefers whichever SHOWN response contains "WIN".
+    # This stays order-consistent (folds to original A), so the panel is unanimous.
+    def backend(body):
+        user = body["messages"][1]["content"]
+        shown_a = user.split("Response A:\n")[1].split("\n\nResponse B:")[0]
+        pref = "A" if "WIN" in shown_a else "B"
+        return {"choices": [{"message": {"content": json.dumps(
+            {"preferred": pref, "confidence": 5, "reasoning": "x"})}}]}
+    out = run_panel("q", "WIN here", "nope", models=["m1", "m2", "m3"], backend=backend)
+    assert out["panel"]["panel_preferred"] == "A"
+    assert out["panel"]["unanimous"] is True
+    assert set(out["verdicts"]) == {"m1", "m2", "m3"}
+
+
 def test_reconcile_judges():
     ids = ["i1", "i2", "i3", "i4"]
     ja = ["A", "A", "B", "B"]

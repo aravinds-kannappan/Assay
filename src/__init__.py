@@ -17,7 +17,7 @@ from . import check, gate, irt, judge, provenance, schema, stats
 from .gate import run_gate
 from .ingest import load_lm_eval_samples
 from .irt import fit_2pl
-from .judge import judge_pairwise, reconcile_judges, validate_judge
+from .judge import judge_pairwise, panel_verdict, reconcile_judges, run_panel, validate_judge
 from .reconcile import reconcile_gsm8k
 
 __all__ = [
@@ -36,4 +36,6 @@ __all__ = [
     "judge_pairwise",
     "validate_judge",
     "reconcile_judges",
+    "panel_verdict",
+    "run_panel",
 ]

@@ -329,3 +329,45 @@ def reconcile_judges(
         "mcnemar_p": mc.p_value,                           # [statistically estimated]
         "disagreements": disagreements,
     }
+
+
+# ---- panel of judges (ensemble) -------------------------------------------
+
+def panel_verdict(finals: Sequence[str]) -> dict:
+    """Aggregate one item's per-judge final preferences into a panel verdict.
+
+    A panel of diverse judges (PoLL, panel-of-LLM-judges) is the ensemble the
+    literature recommends over any single judge. Ties (order-inconsistent judges)
+    do not vote. Returns the majority pick, the vote split, and the agreement.
+    """
+    votes = [f for f in finals if f in ("A", "B")]
+    a, b = votes.count("A"), votes.count("B")
+    n_ties = len(list(finals)) - len(votes)
+    if not votes:
+        return {"panel_preferred": None, "votes_a": 0, "votes_b": 0,
+                "n_abstain": n_ties, "agreement": float("nan"), "unanimous": False}
+    winner = "A" if a > b else ("B" if b > a else "tie")
+    return {"panel_preferred": winner, "votes_a": a, "votes_b": b, "n_abstain": n_ties,
+            "agreement": max(a, b) / len(votes), "unanimous": a == 0 or b == 0}
+
+
+def run_panel(
+    prompt: str, response_a: str, response_b: str, *,
+    models: Sequence[str], backend: JudgeBackend, item_id: str = "", **kw,
+) -> dict:
+    """Harness: run every model as a debiased (two-ordering) judge and aggregate.
+
+    Returns ``{"verdicts": {model: DebiasedVerdict|None}, "panel": panel_verdict(...)}``.
+    This is the scaffolding a full study loops over item by item; a judge that
+    errors becomes ``None`` and simply does not vote (a missing judge is a
+    finding, not a crash).
+    """
+    verdicts: dict = {}
+    for m in models:
+        try:
+            verdicts[m] = judge_pairwise_debiased(prompt, response_a, response_b,
+                                                  model=m, backend=backend, item_id=item_id, **kw)
+        except Exception:
+            verdicts[m] = None
+    finals = [v.final_preferred for v in verdicts.values() if v is not None]
+    return {"verdicts": verdicts, "panel": panel_verdict(finals)}
