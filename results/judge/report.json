@@ -1,0 +1,274 @@
+{
+  "n_items": 23,
+  "n_judges": 10,
+  "provenance": "verdicts [LLM-judged]; agreement/kappa/bias [statistically estimated]",
+  "per_model": {
+    "deepseek-ai/DeepSeek-V4-Pro": {
+      "n": 23,
+      "agreement": 0.895,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.174,
+      "position_bias_p": 0.125,
+      "length_correlation": 0.407,
+      "mde": 0.1972,
+      "items_needed": 5
+    },
+    "moonshotai/Kimi-K2.5": {
+      "n": 23,
+      "agreement": 0.789,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.174,
+      "position_bias_p": 1.0,
+      "length_correlation": 0.542,
+      "mde": 0.262,
+      "items_needed": 16
+    },
+    "moonshotai/Kimi-K2.7-Code": {
+      "n": 19,
+      "agreement": 0.889,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.053,
+      "position_bias_p": 1.0,
+      "length_correlation": 0.477,
+      "mde": 0.2075,
+      "items_needed": 6
+    },
+    "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": {
+      "n": 22,
+      "agreement": 0.889,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.182,
+      "position_bias_p": 0.625,
+      "length_correlation": 0.443,
+      "mde": 0.2075,
+      "items_needed": 6
+    },
+    "nvidia/Nemotron-120B-A12B": {
+      "n": 23,
+      "agreement": 0.875,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.304,
+      "position_bias_p": 0.0156,
+      "length_correlation": 0.574,
+      "mde": 0.2316,
+      "items_needed": 7
+    },
+    "openai/gpt-oss-120b": {
+      "n": 23,
+      "agreement": 0.842,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.174,
+      "position_bias_p": 0.625,
+      "length_correlation": 0.211,
+      "mde": 0.2344,
+      "items_needed": 9
+    },
+    "thinkingmachines/inkling": {
+      "n": 23,
+      "agreement": 0.833,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.217,
+      "position_bias_p": 0.375,
+      "length_correlation": 0.532,
+      "mde": 0.2461,
+      "items_needed": 10
+    },
+    "zai-org/GLM-4.7": {
+      "n": 23,
+      "agreement": 0.737,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.174,
+      "position_bias_p": 1.0,
+      "length_correlation": 0.567,
+      "mde": 0.283,
+      "items_needed": 28
+    },
+    "zai-org/GLM-5": {
+      "n": 23,
+      "agreement": 0.85,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.13,
+      "position_bias_p": 0.25,
+      "length_correlation": 0.449,
+      "mde": 0.2237,
+      "items_needed": 9
+    },
+    "zai-org/GLM-5.2": {
+      "n": 23,
+      "agreement": 0.842,
+      "cohens_kappa": 0.0,
+      "kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "position_bias_rate": 0.174,
+      "position_bias_p": 0.125,
+      "length_correlation": 0.474,
+      "mde": 0.2344,
+      "items_needed": 9
+    }
+  },
+  "panel": {
+    "accuracy_vs_human": 0.864,
+    "n_decided": 22,
+    "best_single_agreement": 0.895
+  },
+  "judge_agreement_matrix": {
+    "deepseek-ai/DeepSeek-V4-Pro": {
+      "deepseek-ai/DeepSeek-V4-Pro": 1.0,
+      "moonshotai/Kimi-K2.5": 0.941,
+      "moonshotai/Kimi-K2.7-Code": 0.944,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 1.0,
+      "nvidia/Nemotron-120B-A12B": 0.929,
+      "openai/gpt-oss-120b": 1.0,
+      "thinkingmachines/inkling": 0.944,
+      "zai-org/GLM-4.7": 0.882,
+      "zai-org/GLM-5": 1.0,
+      "zai-org/GLM-5.2": 1.0
+    },
+    "moonshotai/Kimi-K2.5": {
+      "deepseek-ai/DeepSeek-V4-Pro": 0.941,
+      "moonshotai/Kimi-K2.5": 1.0,
+      "moonshotai/Kimi-K2.7-Code": 0.889,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 0.889,
+      "nvidia/Nemotron-120B-A12B": 0.857,
+      "openai/gpt-oss-120b": 0.824,
+      "thinkingmachines/inkling": 0.941,
+      "zai-org/GLM-4.7": 0.941,
+      "zai-org/GLM-5": 0.944,
+      "zai-org/GLM-5.2": 1.0
+    },
+    "moonshotai/Kimi-K2.7-Code": {
+      "deepseek-ai/DeepSeek-V4-Pro": 0.944,
+      "moonshotai/Kimi-K2.5": 0.889,
+      "moonshotai/Kimi-K2.7-Code": 1.0,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 1.0,
+      "nvidia/Nemotron-120B-A12B": 1.0,
+      "openai/gpt-oss-120b": 0.889,
+      "thinkingmachines/inkling": 1.0,
+      "zai-org/GLM-4.7": 0.889,
+      "zai-org/GLM-5": 0.895,
+      "zai-org/GLM-5.2": 0.941
+    },
+    "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": {
+      "deepseek-ai/DeepSeek-V4-Pro": 1.0,
+      "moonshotai/Kimi-K2.5": 0.889,
+      "moonshotai/Kimi-K2.7-Code": 1.0,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 1.0,
+      "nvidia/Nemotron-120B-A12B": 1.0,
+      "openai/gpt-oss-120b": 1.0,
+      "thinkingmachines/inkling": 1.0,
+      "zai-org/GLM-4.7": 0.875,
+      "zai-org/GLM-5": 0.941,
+      "zai-org/GLM-5.2": 1.0
+    },
+    "nvidia/Nemotron-120B-A12B": {
+      "deepseek-ai/DeepSeek-V4-Pro": 0.929,
+      "moonshotai/Kimi-K2.5": 0.857,
+      "moonshotai/Kimi-K2.7-Code": 1.0,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 1.0,
+      "nvidia/Nemotron-120B-A12B": 1.0,
+      "openai/gpt-oss-120b": 0.933,
+      "thinkingmachines/inkling": 1.0,
+      "zai-org/GLM-4.7": 0.923,
+      "zai-org/GLM-5": 0.857,
+      "zai-org/GLM-5.2": 1.0
+    },
+    "openai/gpt-oss-120b": {
+      "deepseek-ai/DeepSeek-V4-Pro": 1.0,
+      "moonshotai/Kimi-K2.5": 0.824,
+      "moonshotai/Kimi-K2.7-Code": 0.889,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 1.0,
+      "nvidia/Nemotron-120B-A12B": 0.933,
+      "openai/gpt-oss-120b": 1.0,
+      "thinkingmachines/inkling": 0.938,
+      "zai-org/GLM-4.7": 0.824,
+      "zai-org/GLM-5": 0.889,
+      "zai-org/GLM-5.2": 0.938
+    },
+    "thinkingmachines/inkling": {
+      "deepseek-ai/DeepSeek-V4-Pro": 0.944,
+      "moonshotai/Kimi-K2.5": 0.941,
+      "moonshotai/Kimi-K2.7-Code": 1.0,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 1.0,
+      "nvidia/Nemotron-120B-A12B": 1.0,
+      "openai/gpt-oss-120b": 0.938,
+      "thinkingmachines/inkling": 1.0,
+      "zai-org/GLM-4.7": 0.938,
+      "zai-org/GLM-5": 0.941,
+      "zai-org/GLM-5.2": 1.0
+    },
+    "zai-org/GLM-4.7": {
+      "deepseek-ai/DeepSeek-V4-Pro": 0.882,
+      "moonshotai/Kimi-K2.5": 0.941,
+      "moonshotai/Kimi-K2.7-Code": 0.889,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 0.875,
+      "nvidia/Nemotron-120B-A12B": 0.923,
+      "openai/gpt-oss-120b": 0.824,
+      "thinkingmachines/inkling": 0.938,
+      "zai-org/GLM-4.7": 1.0,
+      "zai-org/GLM-5": 0.895,
+      "zai-org/GLM-5.2": 1.0
+    },
+    "zai-org/GLM-5": {
+      "deepseek-ai/DeepSeek-V4-Pro": 1.0,
+      "moonshotai/Kimi-K2.5": 0.944,
+      "moonshotai/Kimi-K2.7-Code": 0.895,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 0.941,
+      "nvidia/Nemotron-120B-A12B": 0.857,
+      "openai/gpt-oss-120b": 0.889,
+      "thinkingmachines/inkling": 0.941,
+      "zai-org/GLM-4.7": 0.895,
+      "zai-org/GLM-5": 1.0,
+      "zai-org/GLM-5.2": 1.0
+    },
+    "zai-org/GLM-5.2": {
+      "deepseek-ai/DeepSeek-V4-Pro": 1.0,
+      "moonshotai/Kimi-K2.5": 1.0,
+      "moonshotai/Kimi-K2.7-Code": 0.941,
+      "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": 1.0,
+      "nvidia/Nemotron-120B-A12B": 1.0,
+      "openai/gpt-oss-120b": 0.938,
+      "thinkingmachines/inkling": 1.0,
+      "zai-org/GLM-4.7": 1.0,
+      "zai-org/GLM-5": 1.0,
+      "zai-org/GLM-5.2": 1.0
+    }
+  }
+}

@@ -19,5 +19,11 @@ data/
 *.parquet
 !examples/*.parquet
 
+# judge study scratch (agent working files, not deliverables)
+results/judge_full/_*
+results/judge_full/chunks/chunk_test.jsonl
+
 # os
 .DS_Store
+
+results/judge_full/verdicts_partial.json

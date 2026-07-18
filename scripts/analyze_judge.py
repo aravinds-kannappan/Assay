@@ -1,155 +1,200 @@
-"""Reproduce the judge-pilot report and figures from committed verdicts.
+"""Analyze the LLM-judge study from whatever verdict chunks exist.
 
-The raw verdicts (results/judge/verdicts.jsonl) were collected by calling 10 live
-models through an OpenAI-compatible endpoint with assay.judge; that collection
-needs an API key and is not rerun here. This script recomputes every statistic and
-figure from the committed verdicts, so the ANALYSIS is fully reproducible offline.
+Reads results/judge_full/chunks/chunk_*.jsonl, validates every judge against the
+human labels with assay.stats, aggregates the panel, builds the judge-vs-judge
+agreement matrix, and writes:
+  results/judge/report.json          per-model + panel + matrix
+  results/judge/explorer_data.json   items + per-judge verdicts & reasoning (site)
+  results/figures/fig_judge_*.png     (mirrored into docs/figures/)
 
-    python scripts/analyze_judge.py
+Data-driven: run it again after more chunks land and everything regenerates.
+Usage: python scripts/analyze_judge.py
 """
+from __future__ import annotations
+
+import glob
 import json
 from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-from assay import stats
+from assay import judge as J
 
 ROOT = Path(__file__).resolve().parent.parent
-JD = ROOT / "results" / "judge"
-FIGS = ROOT / "results" / "figures"
-DOCS = ROOT / "docs" / "figures"
-for d in (FIGS, DOCS):
-    d.mkdir(parents=True, exist_ok=True)
+CHUNKS = ROOT / "results" / "judge_full" / "chunks"
+OUTJ = ROOT / "results" / "judge"; OUTJ.mkdir(parents=True, exist_ok=True)
+FIGS = ROOT / "results" / "figures"; FIGS.mkdir(parents=True, exist_ok=True)
+DOCS_FIGS = ROOT / "docs" / "figures"; DOCS_FIGS.mkdir(parents=True, exist_ok=True)
+DOCS = ROOT / "docs"
+ITEMS = json.load(open(ROOT / "results" / "judge_full" / "items.json"))
+ITEM_BY_ID = {it["item_id"]: it for it in ITEMS}
+
+PROVIDERS = {"openai": "OpenAI", "nvidia": "NVIDIA", "zai-org": "Z.ai", "moonshotai": "Moonshot",
+             "deepseek-ai": "DeepSeek", "thinkingmachines": "Thinking Machines"}
+def provider(m): return PROVIDERS.get(m.split("/")[0], m.split("/")[0])
 
 INK, TEAL, MUTED, WARN, CRIT, GRID = "#10171C", "#0C8C7E", "#63727C", "#B26E12", "#C24248", "#D6DDD9"
-plt.rcParams.update({
-    "figure.facecolor": "white", "axes.facecolor": "white", "axes.edgecolor": MUTED,
-    "axes.labelcolor": INK, "text.color": INK, "xtick.color": MUTED, "ytick.color": MUTED,
-    "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.8, "font.size": 10.5,
-    "axes.titlesize": 12, "axes.titleweight": "bold", "figure.dpi": 150, "savefig.bbox": "tight",
-    "axes.spines.top": False, "axes.spines.right": False,
-})
-
-rows = [json.loads(l) for l in open(JD / "verdicts.jsonl") if l.strip()]
-items = {"it0": "A", "it2": "A", "it5": "B"}   # human winners for the 3 pilot items
-MODELS = list(dict.fromkeys(r["model"] for r in rows))
-SHORT = {"openai/gpt-oss-120b": "gpt-oss-120b", "nvidia/Nemotron-120B-A12B": "Nemotron-Super",
-         "zai-org/GLM-4.7": "GLM-4.7", "moonshotai/Kimi-K2.5": "Kimi-K2.5", "zai-org/GLM-5": "GLM-5",
-         "deepseek-ai/DeepSeek-V4-Pro": "DeepSeek-V4-Pro", "moonshotai/Kimi-K2.7-Code": "Kimi-K2.7-Code",
-         "thinkingmachines/inkling": "inkling", "zai-org/GLM-5.2": "GLM-5.2",
-         "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": "Nemotron-Ultra"}
-PROVIDER = {"openai/gpt-oss-120b": "OpenAI", "nvidia/Nemotron-120B-A12B": "NVIDIA", "zai-org/GLM-4.7": "Z.ai",
-            "moonshotai/Kimi-K2.5": "Moonshot", "zai-org/GLM-5": "Z.ai", "deepseek-ai/DeepSeek-V4-Pro": "DeepSeek",
-            "moonshotai/Kimi-K2.7-Code": "Moonshot", "thinkingmachines/inkling": "Thinking Machines",
-            "zai-org/GLM-5.2": "Z.ai", "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": "NVIDIA"}
+plt.rcParams.update({"figure.facecolor": "white", "axes.facecolor": "white", "axes.edgecolor": MUTED,
+    "axes.labelcolor": INK, "text.color": INK, "xtick.color": MUTED, "ytick.color": MUTED, "axes.grid": True,
+    "grid.color": GRID, "grid.linewidth": 0.8, "font.size": 10.5, "axes.titlesize": 12, "axes.titleweight": "bold",
+    "figure.dpi": 150, "savefig.bbox": "tight", "axes.spines.top": False, "axes.spines.right": False})
 
 
-def cell(it, m):
-    r = next(x for x in rows if x["item_id"] == it and x["model"] == m)
-    return r["pref_ab"], r["pref_ba"]
+def short(m): return m.split("/")[-1]
+def save(fig, name):
+    for d in (FIGS, DOCS_FIGS): fig.savefig(d / name, dpi=150)
 
 
-def final(ab, ba):
-    if ab and ba:
+def load_rows():
+    rows = []
+    for f in sorted(glob.glob(str(CHUNKS / "chunk_*.jsonl"))):
+        if f.endswith("chunk_test.jsonl"):  # the pipeline smoke-test artifact
+            continue
+        for l in open(f):
+            l = l.strip()
+            if not l:
+                continue
+            try:
+                r = json.loads(l)
+            except Exception:
+                continue
+            if r.get("item_id") in ITEM_BY_ID and "human" in r:  # well-formed study rows only
+                rows.append(r)
+    return rows
+
+
+def final_pref(r):
+    ab, ba = r.get("pref_ab"), r.get("pref_ba")
+    if ab in ("A", "B") and ba in ("A", "B"):
         return ab if ab == ba else "tie"
-    return ab or ba
+    return ab if ab in ("A", "B") else (ba if ba in ("A", "B") else None)
 
 
-report = {"design": {"items": list(items), "human_winners": items, "n_models": len(MODELS),
-                     "providers": sorted(set(PROVIDER.values())), "orderings": ["AB", "BA"]},
-          "note": "N=3 pilot on real Chatbot Arena items with 10 live models (7 providers). "
-                  "Demonstrates the pipeline end to end; at N=3 the judge-ranking statistics are "
-                  "deliberately underpowered (see kappa CI). The assay.judge module runs the full study.",
-          "models": {}}
-cons, human_ag, labels, final_matrix = [], [], [], {}
-for m in MODELS:
-    both = consistent = decisive = agree = 0
-    fin = {}
-    for it, human in items.items():
-        ab, ba = cell(it, m)
-        f = final(ab, ba); fin[it] = f
-        if ab and ba:
-            both += 1
-            consistent += (ab == ba)
-        if f in ("A", "B"):
-            decisive += 1
-            agree += (f == human)
-    final_matrix[m] = fin
-    cr = consistent / both if both else float("nan")
-    hr = agree / decisive if decisive else float("nan")
-    cons.append(cr); human_ag.append(hr); labels.append(SHORT[m])
-    report["models"][m] = {"provider": PROVIDER[m], "n_both_orderings": both,
-                           "order_consistency_rate": round(cr, 3),
-                           "position_bias_rate": round(1 - cr, 3) if both else None,
-                           "n_decisive": decisive,
-                           "human_agreement_rate": round(hr, 3) if decisive else None}
+def main():
+    rows = load_rows()
+    models = sorted({r["model"] for r in rows})
+    item_ids = sorted({r["item_id"] for r in rows})
+    by = {(r["item_id"], r["model"]): r for r in rows}
+    n = len(item_ids)
+    print(f"loaded {len(rows)} rows | {n} items | {len(models)} judges")
 
-pooled_j, pooled_h, pooled_cl = [], [], []
-for m in MODELS:
-    for it, human in items.items():
-        f = final_matrix[m][it]
-        if f in ("A", "B"):
-            pooled_j.append(f); pooled_h.append(human); pooled_cl.append(it)
-agree = stats.agreement_rate(pooled_j, pooled_h)
-kappa = stats.cohens_kappa(pooled_j, pooled_h)
-lo, hi, se = stats.kappa_bootstrap_ci(pooled_j, pooled_h, clusters=pooled_cl, n_boot=4000)
-report["pooled"] = {"n_decisive_judgments": len(pooled_j), "human_agreement_rate": round(agree, 3),
-                    "cohens_kappa": round(kappa, 3), "kappa_ci95_item_clustered": [round(lo, 3), round(hi, 3)],
-                    "kappa_se": round(se, 3),
-                    "reading": "the kappa CI is enormous: N=3 cannot rank these judges. That is the point, "
-                               "assay.judge reports the item budget you actually need."}
-report["headline_findings"] = [
-    "9 of 10 judges were 100% order-consistent on the items they completed; Nemotron-Super flipped its "
-    "verdict when A/B order swapped on 2 of 3 items (33% consistent), a clear position-bias outlier.",
-    "Structured-output reliability varied: 3 judges emitted non-standard JSON keys (better/choice/"
-    "better_response) despite a json_schema; 2 reasoning judges returned null on the hardest item under a "
-    "600-token cap, fixed by raising max_tokens to 2048.",
-    "Judges mostly agreed with each other and the human on the two clear items and split on the "
-    "letter-uniqueness puzzle: real disagreement, correctly surfaced.",
-]
-json.dump(report, open(JD / "judge_report.json", "w"), indent=2)
+    per_model = {}
+    finals = {m: {} for m in models}
+    for m in models:
+        H, AB, BA, LA, LB, kept = [], [], [], [], [], []
+        for iid in item_ids:
+            r = by.get((iid, m))
+            finals[m][iid] = final_pref(r) if r else None
+            if not r or r.get("pref_ab") not in ("A", "B") or r.get("pref_ba") not in ("A", "B"):
+                continue
+            H.append(r["human"]); AB.append(r["pref_ab"]); BA.append(r["pref_ba"])
+            LA.append(r["len_a"]); LB.append(r["len_b"]); kept.append(iid)
+        if len(kept) < 2:
+            continue
+        rep = J.validate_judge(H, AB, BA, model=m, len_a=LA, len_b=LB)
+        per_model[m] = {
+            "n": rep.n_items, "agreement": round(rep.agreement_rate, 3),
+            "cohens_kappa": round(rep.cohens_kappa, 3),
+            "kappa_ci": [round(rep.kappa_ci[0], 3), round(rep.kappa_ci[1], 3)],
+            "position_bias_rate": round(rep.position_bias_rate, 3) if rep.position_bias_rate is not None else None,
+            "position_bias_p": round(rep.position_bias_p, 4) if rep.position_bias_p is not None else None,
+            "length_correlation": round(rep.length_correlation, 3) if rep.length_correlation is not None else None,
+            "mde": round(rep.mde, 4), "items_needed": rep.items_needed,
+        }
 
-# Figure J1: per-model order-consistency (position bias)
-order = np.argsort(cons)
-fig, ax = plt.subplots(figsize=(7.6, 4.6))
-cols = [CRIT if cons[i] < 0.5 else (WARN if cons[i] < 1 else TEAL) for i in order]
-ax.barh([labels[i] for i in order], [cons[i] * 100 for i in order], color=cols)
-for j, i in enumerate(order):
-    ax.text(cons[i] * 100 + 2, j, f"{cons[i]*100:.0f}%", va="center", fontsize=9, color=MUTED)
-ax.set_xlim(0, 112); ax.set_xlabel("order-consistency rate (AB verdict == BA verdict)")
-ax.set_title("Position bias: does the judge flip when A/B order swaps?  (N=3 pilot)")
-ax.grid(axis="y", visible=False)
-for folder in (FIGS, DOCS):
-    fig.savefig(folder / "figJ1_position_bias.png", dpi=150)
-plt.close(fig)
+    # panel (ensemble)
+    panel_by = {}; correct = decided = 0
+    for iid in item_ids:
+        fs = [finals[m].get(iid) for m in models]
+        pv = J.panel_verdict(fs)
+        human = ITEM_BY_ID[iid]["human_winner"]
+        pv["item_id"] = iid; pv["human"] = human
+        pv["panel_correct"] = (pv["panel_preferred"] == human) if pv["panel_preferred"] in ("A", "B") else None
+        if pv["panel_correct"] is not None:
+            decided += 1; correct += int(pv["panel_correct"])
+        panel_by[iid] = pv
+    panel_acc = correct / decided if decided else float("nan")
 
-# Figure J2: judge-judge agreement heatmap
-M = len(MODELS)
-mat = np.full((M, M), np.nan)
-for i, mi in enumerate(MODELS):
-    for j, mj in enumerate(MODELS):
-        pairs = [(final_matrix[mi][it], final_matrix[mj][it]) for it in items
-                 if final_matrix[mi][it] in ("A", "B") and final_matrix[mj][it] in ("A", "B")]
-        if pairs:
-            mat[i, j] = sum(1 for a, b in pairs if a == b) / len(pairs)
-fig, ax = plt.subplots(figsize=(7.8, 6.6))
-im = ax.imshow(mat, cmap="BrBG", vmin=0, vmax=1)
-ax.set_xticks(range(M)); ax.set_yticks(range(M))
-ax.set_xticklabels([SHORT[m] for m in MODELS], rotation=45, ha="right", fontsize=8)
-ax.set_yticklabels([SHORT[m] for m in MODELS], fontsize=8)
-for i in range(M):
-    for j in range(M):
-        if not np.isnan(mat[i, j]):
-            ax.text(j, i, f"{mat[i, j]:.1f}", ha="center", va="center",
-                    color="white" if abs(mat[i, j] - 0.5) > 0.35 else INK, fontsize=7)
-ax.set_title("Judge-judge agreement on final verdicts  (N=3 pilot)")
-fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="agreement")
-ax.grid(False)
-for folder in (FIGS, DOCS):
-    fig.savefig(folder / "figJ2_judge_agreement.png", dpi=150)
-plt.close(fig)
+    # judge x judge agreement matrix
+    matrix = {}
+    for a in models:
+        matrix[a] = {}
+        for b in models:
+            both = [(finals[a][i], finals[b][i]) for i in item_ids
+                    if finals[a].get(i) in ("A", "B") and finals[b].get(i) in ("A", "B")]
+            matrix[a][b] = round(sum(1 for x, y in both if x == y) / len(both), 3) if both else None
 
-print(f"models {len(MODELS)} | items {len(items)} | decisive judgments {len(pooled_j)}")
-print(f"pooled human agreement {agree*100:.0f}% | kappa {kappa:+.2f} CI95 [{lo:+.2f},{hi:+.2f}]")
-print("wrote judge_report.json, figJ1_position_bias.png, figJ2_judge_agreement.png")
+    best_single = max((v["agreement"] for v in per_model.values()), default=0)
+    report = {"n_items": n, "n_judges": len(models),
+              "provenance": "verdicts [LLM-judged]; agreement/kappa/bias [statistically estimated]",
+              "per_model": per_model,
+              "panel": {"accuracy_vs_human": round(panel_acc, 3), "n_decided": decided,
+                        "best_single_agreement": round(best_single, 3)},
+              "judge_agreement_matrix": matrix}
+    json.dump(report, open(OUTJ / "report.json", "w"), indent=2)
+
+    # explorer data (shape consumed by docs/index.html judge tab)
+    explorer = []
+    for iid in item_ids:
+        it = ITEM_BY_ID[iid]
+        pv = panel_by[iid]
+        judges = []
+        for m in models:
+            r = by.get((iid, m))
+            if not r: continue
+            judges.append({"model": short(m), "provider": provider(m), "final": finals[m].get(iid),
+                           "conf": r.get("conf_ab"), "reason": (r.get("reason_ab") or "")[:240]})
+        explorer.append({"item_id": iid, "prompt": it["prompt"][:700],
+                         "response_a": it["response_a"][:850], "response_b": it["response_b"][:850],
+                         "model_a": it["model_a"], "model_b": it["model_b"], "human": it["human_winner"],
+                         "panel": {"panel_preferred": pv["panel_preferred"], "votes_a": pv["votes_a"],
+                                   "votes_b": pv["votes_b"], "n_abstain": pv["n_abstain"]},
+                         "judges": judges})
+    payload = {"n_items": n, "n_judges": len(models), "panel_accuracy": round(panel_acc, 3),
+               "best_single": round(best_single, 3), "items": explorer}
+    json.dump(payload, open(OUTJ / "explorer_data.json", "w"))
+    json.dump(payload, open(DOCS / "judge_explorer.json", "w"))  # served by the site
+
+    # figures
+    order = sorted(per_model, key=lambda m: per_model[m]["cohens_kappa"])
+    fig, ax = plt.subplots(figsize=(7.8, 4.7))
+    for i, m in enumerate(order):
+        k = per_model[m]["cohens_kappa"]; lo, hi = per_model[m]["kappa_ci"]
+        ax.plot([lo, hi], [i, i], color=TEAL, lw=2.2); ax.plot(k, i, "o", color=INK, ms=6)
+    ax.axvline(0, color=CRIT, ls="--", lw=1.2)
+    ax.set_yticks(range(len(order))); ax.set_yticklabels([short(m) for m in order])
+    ax.set_xlabel("Cohen's kappa vs human (95% bootstrap CI)")
+    ax.set_title(f"Judge agreement with humans (N={n}); overlapping CIs = can't yet rank judges")
+    ax.grid(axis="y", visible=False); save(fig, "fig_judge_kappa.png"); plt.close(fig)
+
+    ob = sorted(per_model, key=lambda m: per_model[m]["position_bias_rate"] or 0)
+    fig, ax = plt.subplots(figsize=(7.8, 4.4))
+    vals = [(per_model[m]["position_bias_rate"] or 0) * 100 for m in ob]
+    cols = [CRIT if v >= 30 else (WARN if v >= 15 else TEAL) for v in vals]
+    ax.barh([short(m) for m in ob], vals, color=cols)
+    for i, v in enumerate(vals): ax.text(v + 0.4, i, f"{v:.0f}%", va="center", fontsize=9, color=MUTED)
+    ax.set_xlabel("position-bias rate (verdict flips when A/B order swaps)")
+    ax.set_title(f"Position bias by judge (N={n}, both orderings)")
+    ax.grid(axis="y", visible=False); save(fig, "fig_judge_position_bias.png"); plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(6.9, 6.1))
+    Mx = np.array([[matrix[a][b] if matrix[a][b] is not None else np.nan for b in models] for a in models])
+    im = ax.imshow(Mx, cmap="BuGn", vmin=0.4, vmax=1.0)
+    ax.set_xticks(range(len(models))); ax.set_xticklabels([short(m) for m in models], rotation=90, fontsize=7)
+    ax.set_yticks(range(len(models))); ax.set_yticklabels([short(m) for m in models], fontsize=7)
+    for i in range(len(models)):
+        for j in range(len(models)):
+            if not np.isnan(Mx[i, j]): ax.text(j, i, f"{Mx[i,j]:.2f}", ha="center", va="center", fontsize=6,
+                                                color="white" if Mx[i, j] > 0.82 else INK)
+    ax.set_title(f"Judge-vs-judge agreement (N={n})")
+    fig.colorbar(im, fraction=0.046, pad=0.04); save(fig, "fig_judge_heatmap.png"); plt.close(fig)
+
+    print(f"panel accuracy vs human: {panel_acc*100:.0f}% over {decided} decided (best single judge {best_single*100:.0f}%)")
+    ks = [v["cohens_kappa"] for v in per_model.values()]
+    print(f"kappa range: {min(ks):.2f} to {max(ks):.2f}")
+    print("wrote report.json, explorer_data.json, 3 figures")
+
+
+if __name__ == "__main__":
+    main()

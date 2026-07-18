@@ -178,6 +178,7 @@
       <button role="tab" aria-selected="true" data-tab="overview">overview</button>
       <button role="tab" aria-selected="false" data-tab="problem">the problem</button>
       <button role="tab" aria-selected="false" data-tab="demo">live demo</button>
+      <button role="tab" aria-selected="false" data-tab="judge">llm judge</button>
       <button role="tab" aria-selected="false" data-tab="results">results</button>
       <button role="tab" aria-selected="false" data-tab="judge">judge explorer</button>
       <button role="tab" aria-selected="false" data-tab="methods">methods</button>
@@ -361,16 +362,17 @@
   <section class="panel" id="judge" role="tabpanel">
     <div class="eyebrow">the llm judge</div>
     <h2>See the judges think</h2>
-    <p class="sub">10 models from 7 providers judged 100 real Chatbot Arena items, blind, in both A/B orderings.
+    <p class="sub">10 models from 7 providers judge real Chatbot Arena items, blind, in both A/B orderings.
       Read the actual responses (with the real model names revealed) and every judge's pick, confidence, and
       one-line reasoning. Why A/B and not model names during judging? The judges are kept blind to identity to
-      avoid self-preference bias; the names are revealed only here, afterwards.</p>
+      avoid self-preference bias; the names are revealed only here, afterwards. (The item count shown below is
+      this run's real, completed sample.)</p>
 
     <div class="eyebrow lead-space">harness &amp; scaffolding</div>
     <div class="pipeline">
-      <div class="pstep">100 Arena items<span>prompt + 2 responses + human vote</span></div>
+      <div class="pstep">Arena items<span>prompt + 2 responses + human vote</span></div>
       <div class="parrow">&rarr;</div>
-      <div class="pstep">panel: 10 judges &times; 2 orderings<span>2,000 blind calls</span></div>
+      <div class="pstep">panel: 10 judges &times; 2 orderings<span>20 blind calls / item</span></div>
       <div class="parrow">&rarr;</div>
       <div class="pstep">parse + debias<span>flexible JSON, fold BA to AB</span></div>
       <div class="parrow">&rarr;</div>
@@ -378,11 +380,23 @@
       <div class="parrow">&rarr;</div>
       <div class="pstep">validate<span>kappa, position bias, verbosity</span></div>
     </div>
-    <p class="note">The 2,000 calls were run by a fleet of 25 subagents (one per 4-item chunk), each making the real
-      model calls through the Orthogonal MCP and writing verdicts to disk. Harness code:
-      <span class="mono">assay.judge.run_panel</span>, <span class="mono">scripts/run_judge_study.py</span>. Every
-      judgment is <span class="chip llm">LLM-judged</span>; the statistics on top are
-      <span class="chip stat">statistically estimated</span>.</p>
+    <p class="note">The calls run through a fleet of subagents (one per 4-item chunk), each making the real model
+      calls through the Orthogonal MCP and writing verdicts to disk. The 100-item panel is the design target;
+      this deployment completed the sample shown below (both orderings, reasoning captured) before a usage limit,
+      and resumes to 100 with the committed workflow. Harness code:
+      <span class="mono">assay.judge.run_panel</span>, <span class="mono">scripts/run_judge_study.py</span>,
+      <span class="mono">scripts/analyze_judge.py</span>. Every judgment is <span class="chip llm">LLM-judged</span>;
+      the statistics on top are <span class="chip stat">statistically estimated</span>.</p>
+
+    <div class="eyebrow lead-space">what the panel found</div>
+    <div class="cards g2 lead-space">
+      <figure class="figcard"><img src="figures/fig_judge_kappa.png" alt="Per-judge Cohen's kappa versus humans with 95% confidence intervals.">
+        <figcaption><b>Agreement with humans.</b> Cohen's kappa per judge with 95% bootstrap CIs. When the CIs overlap at this sample size, the judges cannot yet be ranked: Assay's own thesis, turned on the judges.</figcaption></figure>
+      <figure class="figcard"><img src="figures/fig_judge_position_bias.png" alt="Per-judge position-bias rate.">
+        <figcaption><b>Position bias.</b> How often each judge's verdict flips when the A/B order is swapped. Higher bars are more order-dependent; the swap-and-average design measures it directly.</figcaption></figure>
+    </div>
+    <figure class="figcard lead-space"><img src="figures/fig_judge_heatmap.png" alt="Judge-versus-judge agreement heatmap across the 10 models.">
+      <figcaption><b>Do the judges agree with each other?</b> Pairwise agreement across all 10 models. The panel vote (PoLL) aggregates them, and beats most single judges against the human labels.</figcaption></figure>
 
     <div class="eyebrow lead-space">explore an item</div>
     <div class="jx-bar">
