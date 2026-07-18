@@ -105,7 +105,16 @@ def main():
                    "human_helpfulness": it["human_helpfulness"],
                    "judge_mean": round(float(np.mean([j["score"] for j in judges])), 2) if judges else None,
                    "judges": judges})
-    payload = {"n_items": n, "models": [short(m) for m in models], "pooled_mean_bias": round(pooled_bias, 3), "items": ex}
+    biasvals = [v["mean_bias"] for v in per.values()] or [0]
+    corrvals = [v["spearman_r"] for v in per.values()] or [0]
+    payload = {"n_items": n, "models": [short(m) for m in models], "pooled_mean_bias": round(pooled_bias, 3),
+               "summary": {"human_mean": report["human_mean"], "pooled_judge_mean": report["pooled_judge_mean"],
+                           "pooled_mean_bias": round(pooled_bias, 3), "pooled_ks_p": report["pooled_ks_p"],
+                           "n_judges": len(models),
+                           "bias_range": [round(min(biasvals), 2), round(max(biasvals), 2)],
+                           "corr_range": [round(min(corrvals), 2), round(max(corrvals), 2)],
+                           "most_lenient": short(max(per, key=lambda m: per[m]["mean_bias"])) if per else None},
+               "items": ex}
     json.dump(payload, open(OUT / "explorer_pointwise.json", "w"))
     json.dump(payload, open(DOCS / "judge_pointwise.json", "w"))
 

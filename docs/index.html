@@ -368,7 +368,34 @@
       avoid self-preference bias; the names are revealed only here, afterwards. (The item count shown below is
       this run's real, completed sample.)</p>
 
-    <div class="eyebrow lead-space">harness &amp; scaffolding</div>
+    <div class="eyebrow lead-space">beyond A/B: graded scores vs real human ratings</div>
+    <h2 style="font-size:24px">Do the judges' scores match humans?</h2>
+    <p class="sub">A binary A/B pick throws away most of the signal. So the same 10 judges also rate real
+      <span class="mono">HelpSteer2</span> responses on the <b>identical 0-4 helpfulness scale the human annotators
+      used</b> (with reasoning), making the two score distributions directly comparable. We then measure the
+      distributional shift: a two-sample KS test, Wasserstein distance, mean bias (leniency), and rank correlation.</p>
+    <div class="cards g2 lead-space">
+      <figure class="figcard"><img src="figures/fig_pw_distribution.png" alt="Human ratings uniform across 0-4; judge ratings piled at the high end.">
+        <figcaption><b>Distribution shift.</b> Human ratings are uniform 0-4 (by construction); the judges pile up at the top. That gap is the leniency bias.</figcaption></figure>
+      <figure class="figcard"><img src="figures/fig_pw_calibration.png" alt="Mean judge score versus human helpfulness level, above the diagonal.">
+        <figcaption><b>Calibration.</b> Mean judge score at each human level. Curves above the diagonal mean the judge over-scores; flat curves mean it compresses the scale.</figcaption></figure>
+      <figure class="figcard"><img src="figures/fig_pw_leniency.png" alt="Per-judge mean bias bar chart with Wasserstein distances.">
+        <figcaption><b>Leniency, per judge.</b> Mean bias (judge minus human) with each judge's Wasserstein distance from the human distribution.</figcaption></figure>
+      <figure class="figcard"><img src="figures/fig_pw_rankcorr.png" alt="Per-judge Spearman rank correlation with human scores.">
+        <figcaption><b>Rank agreement.</b> Spearman correlation with the human scores: judges can still order responses like humans even while inflating the absolute scores.</figcaption></figure>
+    </div>
+    <p class="note" id="pw-findings">Loading distributional results&hellip;</p>
+
+    <div class="eyebrow lead-space">explore a graded item</div>
+    <div class="jx-bar">
+      <button id="px-prev" class="jx-btn">&larr; prev</button>
+      <select id="px-select" class="jx-select"></select>
+      <button id="px-next" class="jx-btn">next &rarr;</button>
+      <span id="px-meta" class="jx-meta mono"></span>
+    </div>
+    <div id="px-body"><p class="note" id="px-loading">Loading graded items&hellip;</p></div>
+
+    <div class="eyebrow lead-space">the original pairwise study (A vs B)</div>
     <div class="pipeline">
       <div class="pstep">Arena items<span>prompt + 2 responses + human vote</span></div>
       <div class="parrow">&rarr;</div>
@@ -623,6 +650,46 @@
     body.appendChild(jl);
   }
   window.jxInit=jxInit;
+})();
+</script>
+<script>
+/* pointwise (graded 0-4) explorer + distributional findings */
+(function(){
+  var sel=document.getElementById('px-select'); if(!sel) return;
+  var data=null, idx=0;
+  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+  function col(s){return s<=1?'#C24248':(s<=2?'#B26E12':'#0C8C7E');}
+  function fmtp(p){return (p!=null&&p<1e-4)?Number(p).toExponential(1):(''+p);}
+  function render(i){
+    if(!data) return;
+    idx=(i+data.items.length)%data.items.length; sel.value=idx;
+    var it=data.items[idx];
+    document.getElementById('px-meta').textContent='item '+(idx+1)+' / '+data.items.length;
+    var h='<div class="jx-card"><span class="jx-badge" style="background:'+col(it.human_helpfulness)+'22;color:'+col(it.human_helpfulness)+'">human helpfulness '+it.human_helpfulness+'/4</span> '
+      +'<span class="jx-badge" style="background:var(--panel)">judge mean '+it.judge_mean+'/4</span>'
+      +'<div class="jx-prompt"><b>Prompt</b><br>'+esc(it.prompt)+'</div>'
+      +'<div class="jx-resp"><b>Response</b><br>'+esc(it.response)+'</div></div><div class="jx-judges">';
+    it.judges.forEach(function(j){
+      h+='<div class="jx-judge"><div class="jx-pick" style="color:'+col(j.score)+'"><b>'+j.score+'/4</b> '+esc(j.model)+'</div><div class="jx-reason">'+esc(j.reason)+'</div></div>';
+    });
+    document.getElementById('px-body').innerHTML=h+'</div>';
+  }
+  fetch('judge_pointwise.json').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){
+    data=d;
+    d.items.forEach(function(it,i){var o=document.createElement('option');o.value=i;o.textContent='#'+(i+1)+' - human '+it.human_helpfulness+'/4 - '+it.prompt.slice(0,42)+'...';sel.appendChild(o);});
+    sel.addEventListener('change',function(){render(+sel.value);});
+    document.getElementById('px-prev').addEventListener('click',function(){render(idx-1);});
+    document.getElementById('px-next').addEventListener('click',function(){render(idx+1);});
+    render(0);
+    var s=d.summary||{}, el=document.getElementById('pw-findings');
+    if(el&&s.pooled_judge_mean!=null){
+      el.innerHTML='<b>Real result (N='+d.n_items+' responses, '+s.n_judges+' judges):</b> the LLM judges rate helpfulness '
+        +'<b>'+s.pooled_judge_mean+'</b> on average versus the human <b>'+s.human_mean+'</b> (leniency +'+s.pooled_mean_bias
+        +'; two-sample KS p='+fmtp(s.pooled_ks_p)+', so the score distributions genuinely differ). Per-judge mean bias runs '
+        +s.bias_range[0]+' to '+s.bias_range[1]+', yet Spearman rank correlation with humans stays '+s.corr_range[0]+' to '
+        +s.corr_range[1]+': the judges over-score but still order responses much like humans. Most lenient judge: '+esc(s.most_lenient)+'.';
+    }
+  }).catch(function(){var el=document.getElementById('px-loading'); if(el) el.textContent='Graded-item data appears here once the pointwise run is published.';});
 })();
 </script>
 </body>
