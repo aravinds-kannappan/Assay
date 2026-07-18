@@ -271,3 +271,74 @@ def holm(p_values: Sequence[float], alpha: float = 0.05) -> list[bool]:
         else:
             break
     return reject
+
+
+# ---- agreement (for judge validation) -------------------------------------
+
+def agreement_rate(a: Sequence, b: Sequence) -> float:
+    """Raw fraction of items where two raters agree. Deterministic."""
+    a = list(a); b = list(b)
+    if len(a) != len(b) or not a:
+        raise ValueError("raters must be non-empty and equal length")
+    return sum(1 for x, y in zip(a, b) if x == y) / len(a)
+
+
+def cohens_kappa(a: Sequence, b: Sequence) -> float:
+    """Cohen's kappa: agreement corrected for the agreement expected by chance.
+
+    Raw agreement is inflated when one label dominates (an LLM judge that always
+    says "A" agrees with a 50/50 human set half the time by luck); kappa removes
+    that. Returns 0.0 in the degenerate case where chance agreement is 1.
+    """
+    a = list(a); b = list(b)
+    if len(a) != len(b) or not a:
+        raise ValueError("raters must be non-empty and equal length")
+    n = len(a)
+    po = sum(1 for x, y in zip(a, b) if x == y) / n
+    labels = set(a) | set(b)
+    pe = sum((a.count(k) / n) * (b.count(k) / n) for k in labels)
+    if 1 - pe <= 1e-12:
+        return 0.0
+    return (po - pe) / (1 - pe)
+
+
+def kappa_bootstrap_ci(
+    a: Sequence,
+    b: Sequence,
+    clusters: Optional[Sequence] = None,
+    n_boot: int = 4000,
+    alpha: float = 0.05,
+    seed: int = 0,
+) -> tuple[float, float, float]:
+    """Percentile bootstrap CI (and SE) for Cohen's kappa.
+
+    If ``clusters`` is given, resamples whole clusters (cluster-aware), because
+    items that share a source are not independent. Returns (lo, hi, se).
+    """
+    a = list(a); b = list(b)
+    rng = np.random.default_rng(seed)
+    n = len(a)
+    if clusters is None:
+        idx_pool = [[i] for i in range(n)]
+    else:
+        groups: dict = {}
+        for i, c in enumerate(clusters):
+            groups.setdefault(c, []).append(i)
+        idx_pool = list(groups.values())
+    G = len(idx_pool)
+    ks = np.empty(n_boot)
+    for it in range(n_boot):
+        pick = rng.integers(0, G, size=G)
+        idx = [i for g in pick for i in idx_pool[g]]
+        ks[it] = cohens_kappa([a[i] for i in idx], [b[i] for i in idx])
+    lo = float(np.quantile(ks, alpha / 2))
+    hi = float(np.quantile(ks, 1 - alpha / 2))
+    return lo, hi, float(ks.std(ddof=1))
+
+
+def spearman(x: Sequence[float], y: Sequence[float]) -> tuple[float, float]:
+    """Spearman rank correlation and its p-value (wraps scipy). Returns (rho, p)."""
+    if len(list(x)) != len(list(y)):
+        raise ValueError("x and y must have equal length")
+    res = sps.spearmanr(list(x), list(y))
+    return float(res.statistic), float(res.pvalue)
