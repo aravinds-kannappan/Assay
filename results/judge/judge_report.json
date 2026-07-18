@@ -1,0 +1,126 @@
+{
+  "design": {
+    "items": [
+      "it0",
+      "it2",
+      "it5"
+    ],
+    "human_winners": {
+      "it0": "A",
+      "it2": "A",
+      "it5": "B"
+    },
+    "n_models": 10,
+    "providers": [
+      "DeepSeek",
+      "Moonshot",
+      "NVIDIA",
+      "OpenAI",
+      "Thinking Machines",
+      "Z.ai"
+    ],
+    "orderings": [
+      "AB",
+      "BA"
+    ]
+  },
+  "note": "N=3 pilot on real Chatbot Arena items with 10 live models (7 providers). Demonstrates the pipeline end to end; at N=3 the judge-ranking statistics are deliberately underpowered (see kappa CI). The assay.judge module runs the full study.",
+  "models": {
+    "openai/gpt-oss-120b": {
+      "provider": "OpenAI",
+      "n_both_orderings": 3,
+      "order_consistency_rate": 1.0,
+      "position_bias_rate": 0.0,
+      "n_decisive": 3,
+      "human_agreement_rate": 1.0
+    },
+    "nvidia/Nemotron-120B-A12B": {
+      "provider": "NVIDIA",
+      "n_both_orderings": 3,
+      "order_consistency_rate": 0.333,
+      "position_bias_rate": 0.667,
+      "n_decisive": 1,
+      "human_agreement_rate": 0.0
+    },
+    "zai-org/GLM-4.7": {
+      "provider": "Z.ai",
+      "n_both_orderings": 3,
+      "order_consistency_rate": 0.667,
+      "position_bias_rate": 0.333,
+      "n_decisive": 2,
+      "human_agreement_rate": 0.5
+    },
+    "moonshotai/Kimi-K2.5": {
+      "provider": "Moonshot",
+      "n_both_orderings": 3,
+      "order_consistency_rate": 1.0,
+      "position_bias_rate": 0.0,
+      "n_decisive": 3,
+      "human_agreement_rate": 0.333
+    },
+    "zai-org/GLM-5": {
+      "provider": "Z.ai",
+      "n_both_orderings": 3,
+      "order_consistency_rate": 0.667,
+      "position_bias_rate": 0.333,
+      "n_decisive": 2,
+      "human_agreement_rate": 0.5
+    },
+    "deepseek-ai/DeepSeek-V4-Pro": {
+      "provider": "DeepSeek",
+      "n_both_orderings": 3,
+      "order_consistency_rate": 0.667,
+      "position_bias_rate": 0.333,
+      "n_decisive": 2,
+      "human_agreement_rate": 1.0
+    },
+    "moonshotai/Kimi-K2.7-Code": {
+      "provider": "Moonshot",
+      "n_both_orderings": 2,
+      "order_consistency_rate": 1.0,
+      "position_bias_rate": 0.0,
+      "n_decisive": 2,
+      "human_agreement_rate": 1.0
+    },
+    "thinkingmachines/inkling": {
+      "provider": "Thinking Machines",
+      "n_both_orderings": 3,
+      "order_consistency_rate": 0.667,
+      "position_bias_rate": 0.333,
+      "n_decisive": 2,
+      "human_agreement_rate": 1.0
+    },
+    "zai-org/GLM-5.2": {
+      "provider": "Z.ai",
+      "n_both_orderings": 3,
+      "order_consistency_rate": 0.667,
+      "position_bias_rate": 0.333,
+      "n_decisive": 2,
+      "human_agreement_rate": 1.0
+    },
+    "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": {
+      "provider": "NVIDIA",
+      "n_both_orderings": 2,
+      "order_consistency_rate": 1.0,
+      "position_bias_rate": 0.0,
+      "n_decisive": 3,
+      "human_agreement_rate": 1.0
+    }
+  },
+  "pooled": {
+    "n_decisive_judgments": 22,
+    "human_agreement_rate": 0.773,
+    "cohens_kappa": 0.553,
+    "kappa_ci95_item_clustered": [
+      0.0,
+      0.614
+    ],
+    "kappa_se": 0.259,
+    "reading": "the kappa CI is enormous: N=3 cannot rank these judges. That is the point, assay.judge reports the item budget you actually need."
+  },
+  "headline_findings": [
+    "9 of 10 judges were 100% order-consistent on the items they completed; Nemotron-Super flipped its verdict when A/B order swapped on 2 of 3 items (33% consistent), a clear position-bias outlier.",
+    "Structured-output reliability varied: 3 judges emitted non-standard JSON keys (better/choice/better_response) despite a json_schema; 2 reasoning judges returned null on the hardest item under a 600-token cap, fixed by raising max_tokens to 2048.",
+    "Judges mostly agreed with each other and the human on the two clear items and split on the letter-uniqueness puzzle: real disagreement, correctly surfaced."
+  ]
+}

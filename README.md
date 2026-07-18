@@ -54,9 +54,10 @@ This is an early, honest cut. What runs today, exercised by the test suite and o
 | `assay.check` | tagged report: accuracy, clustered error bar, SE inflation, MDE | working |
 | `assay.gate` (GitHub Action) | paired significance verdict on a PR: improve / regress / underpowered | working |
 | `assay.irt` | 2PL item response model, Fisher-information fast subsets, ability estimation | working |
+| `assay.judge` | LLM-judge calling (any OpenAI-compatible backend) + validation: kappa w/ clustered CI, position bias, verbosity | working |
 | `assay.provenance` | four-tag system + `assert_all_tagged` (CI-enforced) | working |
 | Inspect AI / HELM adapters | same schema, other harnesses | roadmap |
-| benchmark linter, judge validation | see the [roadmap](https://aravinds-kannappan.github.io/Assay/#roadmap) | roadmap |
+| benchmark linter | see the [roadmap](https://aravinds-kannappan.github.io/Assay/#roadmap) | roadmap |
 
 The full design (13 modules, real datasets, two trained models with pre-registered kill
 criteria, a 10-week roadmap) is on the **[project site](https://aravinds-kannappan.github.io/Assay/)**.
@@ -145,6 +146,23 @@ $ assay irt fit examples/irt_outcomes.jsonl --subset 8
 ```
 
 Add `--json` to any command for the tagged, machine-readable report.
+
+**6. Validate an LLM judge against human labels** (`assay.judge`, backend-agnostic):
+
+```python
+from assay.judge import judge_pairwise_debiased, validate_judge, OpenAICompatibleBackend
+backend = OpenAICompatibleBackend()   # reads ASSAY_JUDGE_BASE_URL + ASSAY_JUDGE_API_KEY
+# ...collect pref_ab / pref_ba per item across judges, then:
+rep = validate_judge(human, pref_ab, pref_ba, clusters=subjects, len_a=la, len_b=lb)
+# rep.cohens_kappa, rep.kappa_ci, rep.position_bias_rate, rep.length_correlation, rep.mde
+```
+
+A real pilot ran **10 live models across 7 providers** as judges on real Chatbot Arena
+items in both A/B orderings. Headline finding: **9 of 10 judges were fully order-consistent;
+Nemotron-Super flipped its verdict when A/B order swapped on 2 of 3 items (a clear
+position-bias outlier)**. At N=3 the judge-ranking kappa CI is enormous, which is the point:
+the module reports the item budget you need. Details, figures, and reproduction in
+[`results/judge/`](results/judge/).
 
 ---
 

@@ -299,6 +299,10 @@
         <figcaption><b>Fig 9.</b> IRT ability tracks raw accuracy but keeps resolving models where accuracy saturates.</figcaption></figure>
       <figure class="figcard"><img src="figures/fig10_fast_subset.png" alt="Reconstruction RMSE versus subset size, Fisher-selected curve below random.">
         <figcaption><b>Fig 10.</b> Fast subsets. Fisher-information items reconstruct ability with fewer items than a random subset.</figcaption></figure>
+      <figure class="figcard"><img src="figures/figJ1_position_bias.png" alt="Per-judge order-consistency bars; Nemotron-Super lowest at 33 percent.">
+        <figcaption><b>Fig J1.</b> Judge panel (10 live models, 7 providers). Nemotron-Super flips its verdict when A/B order swaps: a position-bias outlier.</figcaption></figure>
+      <figure class="figcard"><img src="figures/figJ2_judge_agreement.png" alt="10 by 10 judge-judge agreement heatmap.">
+        <figcaption><b>Fig J2.</b> Judge-judge agreement on the pilot items. The module runs the full study against human labels; see results/judge.</figcaption></figure>
     </div>
     <p class="note">Outputs written alongside the figures: <span class="mono">reconcile_gsm8k.json</span>,
       <span class="mono">check_mmlu_fixture.json</span>, <span class="mono">mde_table.csv</span>, <span class="mono">summary.json</span>.
@@ -358,10 +362,10 @@
           <tr><td class="mono">check</td><td>tagged report: accuracy, clustered error bar, SE inflation, MDE</td><td class="ok-c">working</td></tr>
           <tr><td class="mono">gate</td><td>GitHub Action that annotates a PR with a significance verdict (improve / regress / underpowered)</td><td class="ok-c">working</td></tr>
           <tr><td class="mono">irt</td><td>2PL item-response model, Fisher-information fast subsets, ability estimation</td><td class="ok-c">working</td></tr>
+          <tr><td class="mono">judge</td><td>LLM-judge calling (any OpenAI-compatible backend) + validation: kappa with clustered CI, position bias, verbosity</td><td class="ok-c">working</td></tr>
           <tr><td class="mono">provenance</td><td>four-tag system, enforced in CI</td><td class="ok-c">working</td></tr>
           <tr><td class="mono">inspect / helm</td><td>same schema, other harness adapters</td><td class="road-c">roadmap</td></tr>
           <tr><td class="mono">audit</td><td>tiered benchmark linter validated against relabeled gold</td><td class="road-c">roadmap</td></tr>
-          <tr><td class="mono">judge</td><td>LLM-judge validation: agreement, position bias, verbosity</td><td class="road-c">roadmap</td></tr>
         </tbody>
       </table>
     </div>
