@@ -398,6 +398,12 @@
     <figure class="figcard lead-space"><img src="figures/fig_judge_heatmap.png" alt="Judge-versus-judge agreement heatmap across the 10 models.">
       <figcaption><b>Do the judges agree with each other?</b> Pairwise agreement across all 10 models. The panel vote (PoLL) aggregates them, and beats most single judges against the human labels.</figcaption></figure>
 
+    <p class="note"><b>This run (real, N=27):</b> the 100-item design was usage-limited to 27 items and leans human-A, so
+      the kappa-vs-human numbers are provisional. Findings that are robust at this N regardless of label balance:
+      <b>all 10 judges prefer the longer response</b> (verbosity correlation 0.18 to 0.54); position bias ranges from
+      4% (Kimi-K2.7-Code) to 30% (Nemotron-120B); the panel agrees with humans <b>88%</b> of the time; and the kappa
+      95% CIs all overlap, so the judges <b>cannot yet be ranked</b>. That last point is Assay's own thesis, applied to the judges.</p>
+
     <div class="eyebrow lead-space">explore an item</div>
     <div class="jx-bar">
       <button id="jx-prev" class="jx-btn">&larr; prev</button>
