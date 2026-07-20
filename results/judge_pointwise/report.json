@@ -1,0 +1,263 @@
+{
+  "n_items": 55,
+  "n_judges_total": 10,
+  "n_judges_reliable": 9,
+  "excluded_judges": [
+    "GLM-5.2"
+  ],
+  "min_valid_rate": 0.5,
+  "human_mean": 1.982,
+  "pooled_judge_mean": 1.923,
+  "pooled_mean_bias": -0.059,
+  "pooled_ks_stat": 0.03,
+  "pooled_ks_p": 1.0,
+  "human_dist": [
+    11,
+    11,
+    11,
+    12,
+    10
+  ],
+  "pooled_judge_dist": [
+    111,
+    87,
+    114,
+    95,
+    88
+  ],
+  "reliability": {
+    "DeepSeek-V4-Pro": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "Kimi-K2.5": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "Kimi-K2.7-Code": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "NVIDIA-Nemotron-3-Ultra-550B-A55B": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "Nemotron-120B-A12B": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "gpt-oss-120b": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "inkling": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "GLM-4.7": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "GLM-5": {
+      "attempted": 55,
+      "valid": 55,
+      "valid_response_rate": 1.0
+    },
+    "GLM-5.2": {
+      "attempted": 55,
+      "valid": 7,
+      "valid_response_rate": 0.127
+    }
+  },
+  "per_model": {
+    "deepseek-ai/DeepSeek-V4-Pro": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 2.127,
+      "mean_human": 1.982,
+      "mean_bias": 0.145,
+      "wasserstein": 0.255,
+      "ks_stat": 0.109,
+      "ks_p": 0.9031,
+      "cohens_d": 0.097,
+      "spearman_r": 0.542,
+      "spearman_p": 0.0,
+      "dist": [
+        13,
+        10,
+        5,
+        11,
+        16
+      ]
+    },
+    "moonshotai/Kimi-K2.5": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 1.8,
+      "mean_human": 1.982,
+      "mean_bias": -0.182,
+      "wasserstein": 0.182,
+      "ks_stat": 0.109,
+      "ks_p": 0.9031,
+      "cohens_d": -0.132,
+      "spearman_r": 0.747,
+      "spearman_p": 0.0,
+      "dist": [
+        13,
+        9,
+        17,
+        8,
+        8
+      ]
+    },
+    "moonshotai/Kimi-K2.7-Code": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 1.655,
+      "mean_human": 1.982,
+      "mean_bias": -0.327,
+      "wasserstein": 0.327,
+      "ks_stat": 0.182,
+      "ks_p": 0.3255,
+      "cohens_d": -0.248,
+      "spearman_r": 0.708,
+      "spearman_p": 0.0,
+      "dist": [
+        12,
+        12,
+        19,
+        7,
+        5
+      ]
+    },
+    "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 1.836,
+      "mean_human": 1.982,
+      "mean_bias": -0.145,
+      "wasserstein": 0.255,
+      "ks_stat": 0.109,
+      "ks_p": 0.9031,
+      "cohens_d": -0.097,
+      "spearman_r": 0.731,
+      "spearman_p": 0.0,
+      "dist": [
+        17,
+        9,
+        8,
+        8,
+        13
+      ]
+    },
+    "nvidia/Nemotron-120B-A12B": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 1.982,
+      "mean_human": 1.982,
+      "mean_bias": 0.0,
+      "wasserstein": 0.291,
+      "ks_stat": 0.127,
+      "ks_p": 0.7695,
+      "cohens_d": 0.0,
+      "spearman_r": 0.585,
+      "spearman_p": 0.0,
+      "dist": [
+        6,
+        13,
+        15,
+        18,
+        3
+      ]
+    },
+    "openai/gpt-oss-120b": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 1.964,
+      "mean_human": 1.982,
+      "mean_bias": -0.018,
+      "wasserstein": 0.127,
+      "ks_stat": 0.073,
+      "ks_p": 0.9989,
+      "cohens_d": -0.012,
+      "spearman_r": 0.669,
+      "spearman_p": 0.0,
+      "dist": [
+        15,
+        7,
+        11,
+        9,
+        13
+      ]
+    },
+    "thinkingmachines/inkling": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 2.218,
+      "mean_human": 1.982,
+      "mean_bias": 0.236,
+      "wasserstein": 0.236,
+      "ks_stat": 0.091,
+      "ks_p": 0.9789,
+      "cohens_d": 0.173,
+      "spearman_r": 0.727,
+      "spearman_p": 0.0,
+      "dist": [
+        8,
+        9,
+        11,
+        17,
+        10
+      ]
+    },
+    "zai-org/GLM-4.7": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 1.945,
+      "mean_human": 1.982,
+      "mean_bias": -0.036,
+      "wasserstein": 0.073,
+      "ks_stat": 0.036,
+      "ks_p": 1.0,
+      "cohens_d": -0.026,
+      "spearman_r": 0.704,
+      "spearman_p": 0.0,
+      "dist": [
+        12,
+        9,
+        14,
+        10,
+        10
+      ]
+    },
+    "zai-org/GLM-5": {
+      "n": 55,
+      "valid_response_rate": 1.0,
+      "mean_judge": 1.782,
+      "mean_human": 1.982,
+      "mean_bias": -0.2,
+      "wasserstein": 0.2,
+      "ks_stat": 0.091,
+      "ks_p": 0.9789,
+      "cohens_d": -0.14,
+      "spearman_r": 0.692,
+      "spearman_p": 0.0,
+      "dist": [
+        15,
+        9,
+        14,
+        7,
+        10
+      ]
+    }
+  },
+  "provenance": "scores [LLM-judged] vs human [dataset]; shift stats [statistically estimated]"
+}

@@ -375,14 +375,16 @@
       used</b> (with reasoning), making the two score distributions directly comparable. We then measure the
       distributional shift: a two-sample KS test, Wasserstein distance, mean bias (leniency), and rank correlation.</p>
     <div class="cards g2 lead-space">
-      <figure class="figcard"><img src="figures/fig_pw_distribution.png" alt="Human ratings uniform across 0-4; judge ratings piled at the high end.">
-        <figcaption><b>Distribution shift.</b> Human ratings are uniform 0-4 (by construction); the judges pile up at the top. That gap is the leniency bias.</figcaption></figure>
-      <figure class="figcard"><img src="figures/fig_pw_calibration.png" alt="Mean judge score versus human helpfulness level, above the diagonal.">
-        <figcaption><b>Calibration.</b> Mean judge score at each human level. Curves above the diagonal mean the judge over-scores; flat curves mean it compresses the scale.</figcaption></figure>
+      <figure class="figcard"><img src="figures/fig_pw_reliability.png" alt="Valid structured-score rate per judge; GLM-5.2 far below the others.">
+        <figcaption><b>Can it even be a judge?</b> The first gate: valid structured-score rate. Nine models return a usable 0-4 score every time; <b>GLM-5.2 does so only 13% of the time</b>, so it is excluded from the shift stats. A judge you cannot parse is not a judge.</figcaption></figure>
+      <figure class="figcard"><img src="figures/fig_pw_distribution.png" alt="Human and pooled-judge score distributions, similar overall.">
+        <figcaption><b>Distribution shift.</b> Pooled over the 9 reliable judges, the score distribution sits close to the human one (mean bias only &minus;0.06, KS p=1.0): no systematic inflation here. The shift is in the shape, not the average.</figcaption></figure>
+      <figure class="figcard"><img src="figures/fig_pw_calibration.png" alt="Mean judge score versus human helpfulness level; curves flatter than the diagonal.">
+        <figcaption><b>Calibration (the real story).</b> Mean judge score at each human level. The curves are flatter than the diagonal: judges <b>over-score the worst</b> responses and <b>under-score the best</b>, compressing the scale toward the middle.</figcaption></figure>
       <figure class="figcard"><img src="figures/fig_pw_leniency.png" alt="Per-judge mean bias bar chart with Wasserstein distances.">
-        <figcaption><b>Leniency, per judge.</b> Mean bias (judge minus human) with each judge's Wasserstein distance from the human distribution.</figcaption></figure>
+        <figcaption><b>Bias, per judge.</b> Mean bias (judge minus human), with Wasserstein distance. Judges split both ways: Kimi-K2.7-Code is stricter (&minus;0.33), inkling and DeepSeek more lenient (+0.24, +0.15).</figcaption></figure>
       <figure class="figcard"><img src="figures/fig_pw_rankcorr.png" alt="Per-judge Spearman rank correlation with human scores.">
-        <figcaption><b>Rank agreement.</b> Spearman correlation with the human scores: judges can still order responses like humans even while inflating the absolute scores.</figcaption></figure>
+        <figcaption><b>Rank agreement.</b> Spearman correlation with the human scores (0.54 to 0.75): judges order responses roughly like humans even where their absolute scale drifts.</figcaption></figure>
     </div>
     <p class="note" id="pw-findings">Loading distributional results&hellip;</p>
 
@@ -683,11 +685,12 @@
     render(0);
     var s=d.summary||{}, el=document.getElementById('pw-findings');
     if(el&&s.pooled_judge_mean!=null){
-      el.innerHTML='<b>Real result (N='+d.n_items+' responses, '+s.n_judges+' judges):</b> the LLM judges rate helpfulness '
-        +'<b>'+s.pooled_judge_mean+'</b> on average versus the human <b>'+s.human_mean+'</b> (leniency +'+s.pooled_mean_bias
-        +'; two-sample KS p='+fmtp(s.pooled_ks_p)+', so the score distributions genuinely differ). Per-judge mean bias runs '
-        +s.bias_range[0]+' to '+s.bias_range[1]+', yet Spearman rank correlation with humans stays '+s.corr_range[0]+' to '
-        +s.corr_range[1]+': the judges over-score but still order responses much like humans. Most lenient judge: '+esc(s.most_lenient)+'.';
+      el.innerHTML='<b>Real result (N='+d.n_items+' responses; '+s.n_judges_reliable+' of '+s.n_judges_total+' models reliable enough to include):</b> '
+        +'pooled over the reliable judges, helpfulness averages <b>'+s.pooled_judge_mean+'</b> versus the human <b>'+s.human_mean+'</b> '
+        +'(mean bias '+s.pooled_mean_bias+', two-sample KS p='+fmtp(s.pooled_ks_p)+', so <b>no systematic inflation</b> on this set). '
+        +'Per-judge bias runs '+s.bias_range[0]+' to '+s.bias_range[1]+' (judges split both ways), while Spearman rank correlation with humans holds at '
+        +s.corr_range[0]+' to '+s.corr_range[1]+'. The real shift is <b>scale compression</b> (over-scoring the worst, under-scoring the best), and '
+        +esc(s.worst_reliability)+' returned a valid structured score too rarely to include.';
     }
   }).catch(function(){var el=document.getElementById('px-loading'); if(el) el.textContent='Graded-item data appears here once the pointwise run is published.';});
 })();

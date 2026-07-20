@@ -27,3 +27,9 @@ results/judge_full/chunks/chunk_test.jsonl
 .DS_Store
 
 results/judge_full/verdicts_partial.json
+
+# pointwise judge scratch (raw responses, payloads, agent helpers)
+results/judge_pointwise/raw_*.json
+results/judge_pointwise/payloads/
+results/judge_pointwise/*.py
+results/judge_pointwise/__pycache__/
